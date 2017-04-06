@@ -484,4 +484,84 @@ module.exports = {
 
 ### Frontend
 
-Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages.
+Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages. We will also use the built-in [chat list](http://quasar-framework.org/components/list.html#Chat-List) to list available people. Last, we will use a simple [text input](http://quasar-framework.org/components/input-textbox.html#Floating-Label) to send messages in the chat room. Inside the component these data are respectively stored in **$data.messages**, **$data.users**, **$data.message**. The final template of the **Chat.vue** component is thus the following:
+```html
+<div class="layout">
+  <div class="row fit">
+    <div class="width-4of5">
+      <div v-for="message in messages" v-bind:class="messageClass(message)" style="margin: 50px;">
+        <div class="chat-user">
+          <img :src="message.user.avatar">
+        </div>
+        <div class="chat-date">
+          {{messageDate(message)}}
+        </div>
+        <div class="chat-message">
+          <p>
+            {{message.text}}
+          </p>
+        </div>
+      </div>
+      <div class="fixed-bottom" style="border-top: 1px solid #f4f4f4; background-color: #FFF;">
+        <div class="floating-label">
+          <input required class="full-width" v-model="message" v-on:keyup.enter="send">
+          <label>Enter your message</label>
+        </div>
+      </div>
+    </div>
+    <div class="list content-center">
+      <div class="list-label">People</div>
+      <div v-for="user in users" class="item">
+        <img class="item-primary" :src="user.avatar">
+        <div class="item-content has-secondary">
+          {{user.email}}
+        </div>
+        <i class="item-secondary">
+          chat_bubble
+        </i>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+As you can see we rely on the Quasar [grid layout](http://quasar-framework.org/api/css-grid-layout.html) and [positioning classes](http://quasar-framework.org/api/css-positioning.html) to make the messages fit 4/5 of the page, the user list 1/5 of the page and the message input be fixed at the bottom of the page.
+
+Retrieving messages/users on mount and in real-time is a piece of cake:
+```javascript
+...
+  mounted () {
+    const messages = api.service('messages')
+    const users = api.service('users')
+
+    // Get all users and messages
+    messages.find({
+      query: {
+        $sort: { createdAt: -1 },
+        $limit: 25
+      }
+    })
+    .then((response) => {
+      // We want the latest messages but in the reversed order
+      this.$data.messages = response.data.reverse()
+    })
+    users.find()
+    .then((response) => {
+      this.$data.users = response.data
+    })
+
+    // Add new messages to the message list
+    messages.on('created', message => {
+      this.$data.messages.unshift(message)
+    })
+    // Add new users to the user list
+    users.on('created', user => {
+      this.$data.users = this.$data.users.concat(user)
+    })
+  }
+...
+```
+
+## Conclusion
+
+I hope that, like me, you measure the power of Quasar and Feathers to create beautiful real-time apps in seconds !
