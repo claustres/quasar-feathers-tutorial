@@ -235,42 +235,109 @@ module.exports = function() {
 
 ### Frontend
 
-On the frontend we setup the **SignIn.vue** component as a basic [dialog](http://quasar-framework.org/components/dialog.html) with e-mail/password inputs:
+On the frontend we setup the **SignIn.vue** component as a [basic dialog](http://quasar-framework.org/components/dialog.html) with e-mail/password inputs:
 ```javascript
-Dialog.create({
-  title: 'Sign In',
-  form: {
-    email: {
-      type: 'textbox',
-      label: 'E-mail',
-      model: ''
-    },
-    password: {
-      type: 'password',
-      label: 'Password',
-      model: ''
-    }
-  },
-  buttons: [
-    {
-      label: 'Ok',
-      handler: (data) => {
-        api.authenticate({
-          strategy: 'local',
-          email: data.email,
-          password: data.password
-        }).then(_ => {
-          Toast.create.positive('You are now logged in')
-        })
-        .catch(_ => {
-          Toast.create.negative('Cannot sign in, please check your e-mail or password')
-          this.$router.push({ name: 'home' })
-        })
+import { Toast, Dialog } from 'quasar'
+import api from 'src/api'
+
+export default {
+...
+  Dialog.create({
+    title: 'Sign In',
+    form: {
+      email: {
+        type: 'textbox',
+        label: 'E-mail',
+        model: ''
+      },
+      password: {
+        type: 'password',
+        label: 'Password',
+        model: ''
       }
-    }
-  ]
-})
+    },
+    buttons: [
+      {
+        label: 'Ok',
+        handler: (data) => {
+          api.authenticate({
+            strategy: 'local',
+            email: data.email,
+            password: data.password
+          }).then(_ => {
+            Toast.create.positive('You are now logged in')
+          })
+          .catch(_ => {
+            Toast.create.negative('Cannot sign in, please check your e-mail or password')
+            this.$router.push({ name: 'home' })
+          })
+        }
+      }
+    ]
+  })
+...
 ```
 The final version will manage registration as well depending on the route used to reach the component but you've got the idea.
+
+Once connected the user should land on the home page then be able to navigate in the app, so that in the main layout we have to track the login state as the currently connected user in **$data.user** (null if not logged in):
+```javascript
+import { Toast } from 'quasar'
+import api from 'src/api'
+
+export default {
+...
+  methods: {
+    signout () {
+      api.logout()
+      .then(() => {
+        Toast.create.positive('You are now logged out, sign in again to continue to work')
+      })
+      .catch(_ => {
+        Toast.create.negative('Cannot logout, please check again in a few minutes')
+      })
+    },
+    getUser (accessToken) {
+      return api.passport.verifyJWT(accessToken)
+      .then(payload => {
+        return api.service('users').get(payload.userId)
+      })
+      .then(user => {
+        this.$data.user = user
+        return user
+      })
+    }
+  },
+  mounted () {
+    // Check if there is already a session running
+    api.authenticate()
+    .then((response) => {
+      return this.getUser(response.accessToken)
+    })
+    .then(user => {
+      Toast.create.positive('Restoring previous session')
+    })
+    .catch(_ => {
+      this.$router.push({ name: 'home' })
+    })
+    // On successfull login
+    api.on('authenticated', response => {
+      this.getUser(response.accessToken)
+      .then(user => {
+        this.$router.push({ name: 'home' })
+      })
+    })
+    // On logout
+    api.on('logout', () => {
+      this.$data.user = null
+      this.$router.push({ name: 'home' })
+    })
+  }
+...
+```
+
+We make the current user available to sub components using a **user** [prop](https://vuejs.org/v2/guide/components.html#Props)
+```html
+<router-view class="layout-view" :user="user"></router-view>
+```
 
 
