@@ -33,8 +33,8 @@ $ quasar dev
 Feathers for the backend:
 ```bash
 $ npm install -g feathers-cli
-$ mkdir feathers-chat
-$ cd feathers-chat
+$ mkdir api
+$ cd api
 // Use defaults
 $ feathers generate
 // Will launch the backend server in dev mode on 3030
@@ -46,7 +46,7 @@ The default [NeDB](https://github.com/louischatriot/nedb) datastore is fine for 
 feathers generate service
 ```
 
-To make the Quasar app correctly contacting the backend you have to configure an API proxy in your frontend **config/index.js**:
+To make the Quasar app correctly contacting the backend you have to configure an API proxy in your frontend **src/config/index.js**:
 ```javascript
 ...
   dev: {
@@ -61,7 +61,7 @@ To make the Quasar app correctly contacting the backend you have to configure an
 
 ## API glue
 
-Feathers provides you with a thin layer on the client-side to make API authentication and calls so simple. We create a new **api.js** file in the frontend to handle the glue with the API:
+Feathers provides you with a thin layer on the client-side to make API authentication and calls so simple. We create a new **src/api.js** file in the frontend to handle the glue with the API:
 ```javascript
 import feathers from 'feathers'
 import hooks from 'feathers-hooks'
@@ -107,13 +107,13 @@ users.on('created', user => {
 ## Main layout
 
 From a end-user perspective the application will be simple:
- - a menu toolbar including (**Index.vue** component)
+ - a menu toolbar including (**src/components/Index.vue** component)
    - a sign in/register entry when not connected
    - home/chat entries and a profile menu to logout when connected
  - a sidebar menu recalling the home/chat entries and a about section
- - a landing home page displaying different text depending on the connection state (**Home.vue** component)
- - a signin/register form with email/password (**SignIn.vue** component)
- - a chat view listing available users and providing real-time messages read/write (**Chat.vue** component)
+ - a landing home page displaying different text depending on the connection state (**src/components/Home.vue** component)
+ - a signin/register form with email/password (**src/components/SignIn.vue** component)
+ - a chat view listing available users and providing real-time messages read/write (**src/components/Chat.vue** component)
  
  The main app layout is already part of the Quasar default template so we will directly modify it but additional components can be generated using the CLI:
  ```bash
@@ -122,7 +122,7 @@ From a end-user perspective the application will be simple:
  $ quasar new Chat
  ```
  
- We update the layout of the **Index.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a profile menu with a logout entry using a [Floating Action Button](http://quasar-framework.org/components/floating-action-buttons.html), a [Sidebar menu](http://quasar-framework.org/components/drawer.html) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
+ We update the layout of the **src/components/Index.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a profile menu with a logout entry using a [Floating Action Button](http://quasar-framework.org/components/floating-action-buttons.html), a [Sidebar menu](http://quasar-framework.org/components/drawer.html) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
  ```html
  <q-layout>
     <div slot="header" class="toolbar">
@@ -166,7 +166,7 @@ From a end-user perspective the application will be simple:
   </q-layout>
  ```
  
- We update the router configuration in **router.js** to reflect this as well:
+ We update the router configuration in **src/router.js** to reflect this as well:
  ```javascript
  routes: [
     {
@@ -206,7 +206,7 @@ From a end-user perspective the application will be simple:
 
 ### Backend
 
-In the boilerplate a [local authentication strategy](https://docs.feathersjs.com/authentication/local.html) has been setup based on a [JSON Web Token](https://docs.feathersjs.com/authentication/token.html):
+In the boilerplate a [local authentication strategy](https://docs.feathersjs.com/authentication/local.html) has been setup based on a [JSON Web Token](https://docs.feathersjs.com/authentication/token.html) in **api/src/authentication.js**:
 ```javascript
 const authentication = require('feathers-authentication')
 const jwt = require('feathers-authentication-jwt')
@@ -238,7 +238,7 @@ module.exports = function() {
 
 ### Frontend
 
-On the frontend we setup the **SignIn.vue** component as a [basic dialog](http://quasar-framework.org/components/dialog.html) with e-mail/password inputs:
+On the frontend we setup the **src/components/SignIn.vue** component as a [basic dialog](http://quasar-framework.org/components/dialog.html) with e-mail/password inputs:
 ```javascript
 import { Toast, Dialog } from 'quasar'
 import api from 'src/api'
@@ -284,7 +284,7 @@ export default {
 ```
 The final version will manage registration as well depending on the route used to reach the component but you've got the idea.
 
-Once connected the user should land on the home page then be able to navigate in the app, so that in the main layout we have to track the login state as the currently connected user in **$data.user** (null if not logged in). We will also manage logout from the profile menu entry and restoring the previous session if any by trying to authenticate on mount:
+Once connected the user should land on the home page then be able to navigate in the app, so that in the main layout we have to track the login state as the currently connected user in **$data.user** (null if not logged in). We will also manage logout from the profile menu entry and restoring the previous session if any by trying to authenticate on mounting **src/components/Index.vue**:
 ```javascript
 import { Toast } from 'quasar'
 import api from 'src/api'
@@ -340,7 +340,7 @@ export default {
 ...
 ```
 
-We make the current user available to sub components easily using a **user** [prop](https://vuejs.org/v2/guide/components.html#Props)
+We make the current user available to sub components easily using a **user** [prop](https://vuejs.org/v2/guide/components.html#Props) in the index component template:
 ```html
 <router-view class="layout-view" :user="user"></router-view>
 ```
@@ -351,7 +351,7 @@ Now most of the skeleton is in place the main feature of our app remains to be d
 
 ### Backend
 
-In the boilerplate we generated a basic model for our messages in the datastore:
+In the boilerplate we generated a basic model for our messages and datastore in **api/src/models/messages.model.js**:
 ```javascript
 const NeDB = require('nedb')
 const path = require('path')
@@ -367,7 +367,7 @@ module.exports = function(app) {
 }
 ```
 
-We then add a [hook](https://docs.feathersjs.com/hooks/readme.html) in **hooks/process-message.js** to automatically process messages on creation in order to:
+We then add a [hook](https://docs.feathersjs.com/hooks/readme.html) in **api/src/hooks/process-message.js** to automatically process messages on creation in order to:
 - do some basic escaping of the content
 - add the creation date
 - add the ID of the user that created it
@@ -397,7 +397,7 @@ module.exports = function() {
   }
 }
 ```
-We include this hook for our messages, as well as the one for authentication and the one to automatically populate the user that created the message, in **services/messages/messages.hooks.js**:
+We include this hook for our messages, as well as the one for authentication and the one to automatically populate the user that created the message, in **api/src/services/messages/messages.hooks.js**:
 ```javascript
 const { authenticate } = require('feathers-authentication').hooks
 const { populate } = require('feathers-hooks-common')
@@ -435,7 +435,7 @@ module.exports = {
 
 ```
 
-One more [hook](https://docs.feathersjs.com/hooks/readme.html) in **hooks/gravatar.js** will help us provide each user with his [Gravatar](https://www.gravatar.com/) in order to have a beautiful picture in the chat view:
+One more [hook](https://docs.feathersjs.com/hooks/readme.html) in **api/src/hooks/gravatar.js** will help us provide each user with his [Gravatar](https://www.gravatar.com/) in order to have a beautiful picture in the chat view:
 ```javascript
 // We need this to create the MD5 hash
 const crypto = require('crypto')
@@ -457,7 +457,7 @@ module.exports = function() {
   }
 }
 ```
-We include this hook for our users, as well as the one for authentication (except to be able to create a user when registering), in **services/users/users.hooks.js**:
+We include this hook for our users, as well as the one for authentication (except to be able to create a user when registering), in **api/src/services/users/users.hooks.js**:
 ```javascript
 const { authenticate } = require('feathers-authentication').hooks
 const { hashPassword } = require('feathers-authentication-local').hooks
@@ -487,7 +487,7 @@ module.exports = {
 
 ### Frontend
 
-Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages. We will also use the built-in [chat list](http://quasar-framework.org/components/list.html#Chat-List) to list available people. Last, we will use a simple [text input](http://quasar-framework.org/components/input-textbox.html#Floating-Label) to send messages in the chat room. Inside the component these data are respectively stored in **$data.messages**, **$data.users**, **$data.message**. The final template of the **Chat.vue** component is thus the following:
+Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages. We will also use the built-in [chat list](http://quasar-framework.org/components/list.html#Chat-List) to list available people. Last, we will use a simple [text input](http://quasar-framework.org/components/input-textbox.html#Floating-Label) to send messages in the chat room. Inside the component these data are respectively stored in **$data.messages**, **$data.users**, **$data.message**. The final template of the **src/components/Chat.vue** component is thus the following:
 ```html
 <div class="layout">
   <div class="row fit">
@@ -530,7 +530,7 @@ Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.
 
 As you can see we rely on the Quasar [grid layout](http://quasar-framework.org/api/css-grid-layout.html) and [positioning classes](http://quasar-framework.org/api/css-positioning.html) to make the messages fit 4/5 of the page, the user list 1/5 of the page and the message input be fixed at the bottom of the page.
 
-Retrieving messages/users on mount and in real-time is a piece of cake:
+Retrieving messages/users on mount and in real-time is a piece of cake in **src/components/Chat.vue**:
 ```javascript
 ...
   mounted () {
