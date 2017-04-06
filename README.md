@@ -38,7 +38,7 @@ $ feathers generate
 $ npm start
 ```
 
-Because we generated the Feathers boilerplate with authentication we already have a **user** service providing [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations as well. But as we want to develop a chat application we miss a **message** service so we generate it in the backend folder:
+The default [NeDB](https://github.com/louischatriot/nedb) datastore is fine for our tutorial because it does not rely on any third-party DB software to be installed. Because we generated the Feathers boilerplate with authentication we already have a **user** service providing [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations as well. But as we want to develop a chat application we miss a **message** service so we generate it in the backend folder:
 ```bash
 feathers generate service
 ```
@@ -230,7 +230,7 @@ module.exports = function() {
       ]
     }
   })
-};
+}
 ```
 
 ### Frontend
@@ -242,44 +242,46 @@ import api from 'src/api'
 
 export default {
 ...
-  Dialog.create({
-    title: 'Sign In',
-    form: {
-      email: {
-        type: 'textbox',
-        label: 'E-mail',
-        model: ''
-      },
-      password: {
-        type: 'password',
-        label: 'Password',
-        model: ''
-      }
-    },
-    buttons: [
-      {
-        label: 'Ok',
-        handler: (data) => {
-          api.authenticate({
-            strategy: 'local',
-            email: data.email,
-            password: data.password
-          }).then(_ => {
-            Toast.create.positive('You are now logged in')
-          })
-          .catch(_ => {
-            Toast.create.negative('Cannot sign in, please check your e-mail or password')
-            this.$router.push({ name: 'home' })
-          })
+  mounted () {
+    Dialog.create({
+      title: 'Sign In',
+      form: {
+        email: {
+          type: 'textbox',
+          label: 'E-mail',
+          model: ''
+        },
+        password: {
+          type: 'password',
+          label: 'Password',
+          model: ''
         }
-      }
-    ]
-  })
+      },
+      buttons: [
+        {
+          label: 'Ok',
+          handler: (data) => {
+            api.authenticate({
+              strategy: 'local',
+              email: data.email,
+              password: data.password
+            }).then(_ => {
+              Toast.create.positive('You are now logged in')
+            })
+            .catch(_ => {
+              Toast.create.negative('Cannot sign in, please check your e-mail or password')
+              this.$router.push({ name: 'home' })
+            })
+          }
+        }
+      ]
+    })
+  }
 ...
 ```
 The final version will manage registration as well depending on the route used to reach the component but you've got the idea.
 
-Once connected the user should land on the home page then be able to navigate in the app, so that in the main layout we have to track the login state as the currently connected user in **$data.user** (null if not logged in):
+Once connected the user should land on the home page then be able to navigate in the app, so that in the main layout we have to track the login state as the currently connected user in **$data.user** (null if not logged in). We will also manage logout from the profile menu entry and restoring the previous session if any by trying to authenticate on mount:
 ```javascript
 import { Toast } from 'quasar'
 import api from 'src/api'
@@ -335,9 +337,151 @@ export default {
 ...
 ```
 
-We make the current user available to sub components using a **user** [prop](https://vuejs.org/v2/guide/components.html#Props)
+We make the current user available to sub components easily using a **user** [prop](https://vuejs.org/v2/guide/components.html#Props)
 ```html
 <router-view class="layout-view" :user="user"></router-view>
 ```
 
+## Real-time chat
 
+Now most of the skeleton is in place the main feature of our app remains to be developed.
+
+### Backend
+
+In the boilerplate we generated a basic model for our messages in the datastore:
+```javascript
+const NeDB = require('nedb')
+const path = require('path')
+
+module.exports = function(app) {
+  const dbPath = app.get('nedb')
+  const Model = new NeDB({
+    filename: path.join(dbPath, 'messages.db'),
+    autoload: true
+  })
+
+  return Model
+}
+```
+
+We then add a [hook](https://docs.feathersjs.com/hooks/readme.html) in **hooks/process-message.js** to automatically process messages on creation in order to:
+- do some basic escaping of the content
+- add the creation date
+- add the ID of the user that created it
+
+```javascript
+module.exports = function() {
+  return function(hook) {
+    // The authenticated user
+    const user = hook.params.user
+    // The actual message text
+    const text = hook.data.text
+      // Messages can't be longer than 400 characters
+      .substring(0, 400)
+      // Do some basic HTML escaping
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    // Override the original data
+    hook.data = {
+      text,
+      // Set the user id
+      userId: user._id,
+      // Add the current time via `getTime`
+      createdAt: new Date().getTime()
+    }
+    // Hooks can either return nothing or a promise
+    // that resolves with the `hook` object for asynchronous operations
+    return Promise.resolve(hook)
+  }
+}
+```
+We include this hook for our messages, as well as the one for authentication and the one to automatically populate the user that created the message, in **services/messages/messages.hooks.js**:
+```javascript
+const { authenticate } = require('feathers-authentication').hooks
+const { populate } = require('feathers-hooks-common')
+const processMessage = require('../../hooks/process-message')
+
+module.exports = {
+  before: {
+    all: [ authenticate('jwt') ],
+    find: [],
+    get: [],
+    create: [ processMessage() ],
+    update: [ processMessage() ],
+    patch: [ processMessage() ],
+    remove: []
+  },
+  after: {
+    all: [
+      populate({
+        schema: {
+          include: [{
+            service: 'users',
+            nameAs: 'user',
+            parentField: 'userId',
+            childField: '_id'
+          }]
+        }
+      })
+    ],
+    ...
+  },
+  error: {
+    ...
+  }
+}
+
+```
+
+One more [hook](https://docs.feathersjs.com/hooks/readme.html) in **hooks/gravatar.js** will help us provide each user with his [Gravatar](https://www.gravatar.com/) in order to have a beautiful picture in the chat view:
+```javascript
+// We need this to create the MD5 hash
+const crypto = require('crypto')
+// The Gravatar image service
+const gravatarUrl = 'https://s.gravatar.com/avatar'
+// The size query. Our chat needs 60px images
+const query = 's=200'
+
+module.exports = function() {
+  return function(hook) {
+    // The user email
+    const { email } = hook.data
+    // Gravatar uses MD5 hashes from an email address to get the image
+    const hash = crypto.createHash('md5').update(email).digest('hex')
+    hook.data.avatar = `${gravatarUrl}/${hash}?${query}`
+    // Hooks can either return nothing or a promise
+    // that resolves with the `hook` object for asynchronous operations
+    return Promise.resolve(hook);
+  }
+}
+```
+We include this hook for our users, as well as the one for authentication (except to be able to create a user when registering), in **services/users/users.hooks.js**:
+```javascript
+const { authenticate } = require('feathers-authentication').hooks
+const { hashPassword } = require('feathers-authentication-local').hooks
+const commonHooks  = require('feathers-hooks-common')
+const gravatar = require('../../hooks/gravatar')
+
+module.exports = {
+  before: {
+    all: [],
+    find: [ authenticate('jwt') ],
+    get: [ authenticate('jwt') ],
+    create: [hashPassword(), gravatar()],
+    update: [ authenticate('jwt') ],
+    patch: [ authenticate('jwt') ],
+    remove: [ authenticate('jwt') ]
+  },
+  after: {
+    all: [commonHooks.when(hook => hook.params.provider, commonHooks.discard('password'))],
+    ...
+  },
+  error: {
+    ...
+  }
+}
+
+```
+
+### Frontend
+
+Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages.
