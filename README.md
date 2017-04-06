@@ -96,7 +96,7 @@ api.authenticate({
 users.find().then((response) => {
   this.$data.users = response.data
 })
-// Liste to user events
+// Listen to user events
 users.on('created', user => {
   this.$data.users = this.$data.users.concat(user)
 })
