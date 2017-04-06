@@ -9,7 +9,7 @@ I decided to start building a basic real-time chat app intensively inspired from
 [![Authentication video](https://img.youtube.com/vi/_iqnjpQ9gRo/0.jpg)](https://www.youtube.com/watch?v=_iqnjpQ9gRo)
 [![Chat video](https://img.youtube.com/vi/te1w33vaDXI/0.jpg)](https://www.youtube.com/watch?v=te1w33vaDXI)
 
-You can download the source code of the app [here](https://github.com/claustres/quasar-feathers-tutorial/raw/master/quasar-feathers.zip).
+You can download the source code of the app [here](https://github.com/claustres/quasar-feathers-tutorial/raw/master/quasar-feathers.zip) or clone this repo and jump in the **quasar-feathers** directory.
 
 ## Disclaimer
 
@@ -24,13 +24,13 @@ Each framework provides its own CLI so that starting a project is easy, with a c
 Quasar for the frontend:
 ```bash
 $ npm install -g quasar-cli
-$ quasar init quasar-chat
-$ cd quasar-chat
+$ quasar init quasar-feathers
+$ cd quasar-feathers
 $ npm install
 // Will launch the frontend server in dev mode on 8080
 $ quasar dev
 ```
-Feathers for the backend:
+Feathers for the backend in the app root directory:
 ```bash
 $ npm install -g feathers-cli
 $ mkdir api
