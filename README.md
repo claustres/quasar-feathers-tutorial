@@ -4,7 +4,7 @@ A couple of days ago I 've started looking at what could be the foundation to bu
 
 Then I looked for something similar to handle the most basic tasks of creating real-time web apps on the server-side, I dreamed of a framework handling indifferently REST/socket API calls, with built-in support for most authentication schemes, being database/transport agnostic so that I could develop microservices powering different technologies. I naturally found [Feathers](https://blog.feathersjs.com/introducing-feathers-2-0-aae8ae8e7920), which additionnaly provides all of this with a plugin based architecture around a minimalist core.
 
-I decided to start building a basic real-time chat app intensively inspired from https://github.com/feathersjs/feathers-chat (thanks to the Feathers team for their great material):
+I decided to start building a basic real-time chat app intensively inspired from https://github.com/feathersjs/feathers-chat (many thanks to the Feathers team for their great material):
 
 [![Authentication video](https://img.youtube.com/vi/_iqnjpQ9gRo/0.jpg)](https://www.youtube.com/watch?v=_iqnjpQ9gRo)
 [![Chat video](https://img.youtube.com/vi/te1w33vaDXI/0.jpg)](https://www.youtube.com/watch?v=te1w33vaDXI)
