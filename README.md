@@ -88,7 +88,7 @@ api.authenticate({
   strategy: 'local',
   email: email,
   password: password
-}).then(user => {
+}).then(_ => {
   Toast.create.positive('Authenticated')
 })
 // Get all users
@@ -203,6 +203,74 @@ From a end-user perspective the application will be simple:
 
 ### Backend
 
+In the boilerplate a [local authentication strategy](https://docs.feathersjs.com/authentication/local.html) has been setup based on a [JSON Web Token](https://docs.feathersjs.com/authentication/token.html):
+```javascript
+const authentication = require('feathers-authentication')
+const jwt = require('feathers-authentication-jwt')
+const local = require('feathers-authentication-local')
+
+module.exports = function() {
+  const app = this
+  const config = app.get('authentication')
+
+  // Set up authentication with the secret
+  app.configure(authentication(config))
+  app.configure(jwt())
+  app.configure(local())
+  // The `authentication` service is used to create a JWT.
+  // The before `create` hook registers strategies that can be used
+  // to create a new valid JWT (e.g. local or oauth2)
+  app.service('authentication').hooks({
+    before: {
+      create: [
+        authentication.hooks.authenticate(config.strategies)
+      ],
+      remove: [
+        authentication.hooks.authenticate('jwt')
+      ]
+    }
+  })
+};
+```
+
 ### Frontend
+
+On the frontend we setup the **SignIn.vue** component as a basic [dialog](http://quasar-framework.org/components/dialog.html) with e-mail/password inputs:
+```javascript
+Dialog.create({
+  title: 'Sign In',
+  form: {
+    email: {
+      type: 'textbox',
+      label: 'E-mail',
+      model: ''
+    },
+    password: {
+      type: 'password',
+      label: 'Password',
+      model: ''
+    }
+  },
+  buttons: [
+    {
+      label: 'Ok',
+      handler: (data) => {
+        api.authenticate({
+          strategy: 'local',
+          email: data.email,
+          password: data.password
+        }).then(_ => {
+          Toast.create.positive('You are now logged in')
+        })
+        .catch(_ => {
+          Toast.create.negative('Cannot sign in, please check your e-mail or password')
+          this.$router.push({ name: 'home' })
+        })
+      }
+    }
+  ]
+})
+```
+The final version will manage registration as well depending on the route used to reach the component but you've got the idea.
 
 
