@@ -19,6 +19,10 @@ Last but not least, I assume your are familiar with the [Vue.js](https://vuejs.o
 
 ## Installation and configuration
 
+**This tutorial has been made initially with Quasar version 0.13.4 and Feathers version 2.1.1.** 
+
+Some updates have been integrated to make it "work" as well with higher versions such as Feathers v 3.0.0 (Auk), but feel free to submit any problem by opening an [Issue](https://github.com/claustres/quasar-feathers-tutorial/issues) or upgrade the code with a [Pull Request](https://github.com/claustres/quasar-feathers-tutorial/pulls).
+
 Each framework provides its own CLI so that starting a project is easy, with a couple of instructions you have everything ready to start coding your app.
 
 Quasar for the frontend:
@@ -35,9 +39,11 @@ Feathers for the backend in the app root directory:
 $ npm install -g feathers-cli
 $ mkdir api
 $ cd api
-// Use defaults
+// For latest Feathers (Auk release)
 $ feathers generate app
 $ feathers generate authentication
+// For legacy Feathers (Pre-Auk releases)
+$ feathers generate
 // Will launch the backend server in dev mode on 3030
 $ npm start
 ```
