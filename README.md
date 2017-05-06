@@ -36,7 +36,8 @@ $ npm install -g feathers-cli
 $ mkdir api
 $ cd api
 // Use defaults
-$ feathers generate
+$ feathers generate app
+$ feathers generate authentication
 // Will launch the backend server in dev mode on 3030
 $ npm start
 ```
