@@ -125,7 +125,7 @@ From a end-user perspective the application will be simple:
  The main app layout is already part of the Quasar default template so we will directly modify it but additional components can be generated using the CLI:
  ```bash
  $ quasar new Home
- $ quasar new SingIn
+ $ quasar new SignIn
  $ quasar new Chat
  ```
  
