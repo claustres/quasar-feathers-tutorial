@@ -1,48 +1,63 @@
 <template>
-  <div class="layout">
-    <div class="row fit">
-      <div class="width-4of5">
-        <div v-for="message in messages" v-bind:class="messageClass(message)" style="margin: 50px;">
-          <div class="chat-user">
-            <img :src="message.user.avatar">
-          </div>
-          <div class="chat-date">
-            {{messageDate(message)}}
-          </div>
-          <div class="chat-message">
-            <p>
-              {{message.text}}
-            </p>
-          </div>
-        </div>
-        <div class="fixed-bottom" style="border-top: 1px solid #f4f4f4; background-color: #FFF;">
-          <div class="floating-label">
-            <input required class="full-width" v-model="message" v-on:keyup.enter="send">
-            <label>Enter your message</label>
-          </div>
-        </div>
+  <div>
+    <div class="row">
+      <div class="layout-padding col-8" >
+        <q-chat-message v-for="message in messages" 
+          :text="[message.text]"
+          :avatar="message.user.avatar"
+          :stamp="messageDate(message)"
+          :sent="isSent(message) ? true : false"
+        />
       </div>
-      <div class="list content-center">
-        <div class="list-label">People</div>
-        <div v-for="user in users" class="item">
-          <img class="item-primary" :src="user.avatar">
-          <div class="item-content has-secondary">
-            {{user.email}}
-          </div>
-          <i class="item-secondary">
-            chat_bubble
-          </i>
-        </div>
-      </div>
+      <q-list highlight class="col-auto">
+        <q-list-header>People</q-list-header>
+        <q-item v-for="user in users">
+          <q-item-side :avatar="user.avatar" />
+          <q-item-main>
+            <q-item-tile label>{{user.email}}</q-item-tile>
+          </q-item-main>
+          <q-item-side right>
+            <q-item-tile icon="chat_bubble" color="green" />
+          </q-item-side>
+        </q-item>
+      </q-list>
     </div>
+    <q-input class="row col-12 fixed-bottom" 
+      v-model="message"
+      v-on:keyup.enter="send"
+      type="textarea"
+      float-label="Enter your message"
+      :min-rows="1"
+    />
   </div>
 </template>
 
 <script>
+import {
+  QInput,
+  QList,
+  QListHeader,
+  QItem,
+  QItemTile,
+  QItemMain,
+  QItemSide,
+  QChatMessage
+} from 'quasar'
 import moment from 'moment'
 import api from 'src/api'
 
 export default {
+  name: 'chat',
+  components: {
+    QInput,
+    QList,
+    QListHeader,
+    QItem,
+    QItemTile,
+    QItemMain,
+    QItemSide,
+    QChatMessage
+  },
   props: ['user'],
   data () {
     return {
@@ -54,11 +69,8 @@ export default {
   computed: {
   },
   methods: {
-    messageClass (message) {
-      return {
-        'chat-you': (message.userId === this.user._id),
-        'chat-other': (message.userId !== this.user._id)
-      }
+    isSent (message) {
+      return (message.userId === this.user._id)
     },
     messageDate (message) {
       return moment(message.createdAt).format('MMM Do, hh:mm:ss')
@@ -82,14 +94,14 @@ export default {
         $limit: 25
       }
     })
-    .then((response) => {
-      // We want the latest messages but in the reversed order
-      this.$data.messages = response.data.reverse()
-    })
+      .then((response) => {
+        // We want the latest messages but in the reversed order
+        this.$data.messages = response.data.reverse()
+      })
     users.find()
-    .then((response) => {
-      this.$data.users = response.data
-    })
+      .then((response) => {
+        this.$data.users = response.data
+      })
 
     // Add new messages to the message list
     messages.on('created', message => {

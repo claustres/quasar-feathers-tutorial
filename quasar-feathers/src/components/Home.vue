@@ -25,25 +25,24 @@
 </template>
 
 <script>
-
-export default {
-  props: ['user'],
-  data () {
-    return {
+  export default {
+    props: ['user'],
+    data () {
+      return {
+      }
+    },
+    computed: {
+      authenticated () {
+        return this.user !== null
+      }
+    },
+    methods: {
+    },
+    mounted () {
+    },
+    beforeDestroy () {
     }
-  },
-  computed: {
-    authenticated () {
-      return this.user !== null
-    }
-  },
-  methods: {
-  },
-  mounted () {
-  },
-  beforeDestroy () {
   }
-}
 </script>
 
 <style lang="styl">

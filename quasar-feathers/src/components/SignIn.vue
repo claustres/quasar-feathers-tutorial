@@ -37,7 +37,7 @@ export default {
       title: this.isRegistration() ? 'Register' : 'Sign In',
       form: {
         email: {
-          type: 'textbox',
+          type: 'email',
           label: 'E-mail',
           model: ''
         },
@@ -53,26 +53,26 @@ export default {
           handler: (data) => {
             if (this.isRegistration()) {
               this.register(data.email, data.password)
-              .then(() => {
-                return this.login(data.email, data.password)
-              })
-              .then(_ => {
-                Toast.create.positive('You are now logged in')
-              })
-              .catch(_ => {
-                Toast.create.negative('Cannot register, please check your e-mail or password')
-                this.$router.push({ name: 'home' })
-              })
+                .then(() => {
+                  return this.login(data.email, data.password)
+                })
+                .then(_ => {
+                  Toast.create.positive('You are now logged in')
+                })
+                .catch(_ => {
+                  Toast.create.negative('Cannot register, please check your e-mail or password')
+                  this.$router.push({ name: 'home' })
+                })
             }
             else {
               this.login(data.email, data.password)
-              .then(_ => {
-                Toast.create.positive('You are now logged in')
-              })
-              .catch(_ => {
-                Toast.create.negative('Cannot sign in, please check your e-mail or password')
-                this.$router.push({ name: 'home' })
-              })
+                .then(_ => {
+                  Toast.create.positive('You are now logged in')
+                })
+                .catch(_ => {
+                  Toast.create.negative('Cannot sign in, please check your e-mail or password')
+                  this.$router.push({ name: 'home' })
+                })
             }
           }
         }

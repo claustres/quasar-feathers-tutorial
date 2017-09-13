@@ -19,7 +19,7 @@ Last but not least, I assume your are familiar with the [Vue.js](https://vuejs.o
 
 ## Installation and configuration
 
-**This tutorial has been made initially with Quasar version 0.13.4 and Feathers version 2.1.1.** 
+**This tutorial has been made upgraded to Quasar version 0.14.1 and Feathers version 2.1.4.**
 
 Some updates have been integrated to make it "work" as well with higher versions such as Feathers v 3.0.0 (Auk), but feel free to submit any problem by opening an [Issue](https://github.com/claustres/quasar-feathers-tutorial/issues) or upgrade the code with a [Pull Request](https://github.com/claustres/quasar-feathers-tutorial/pulls).
 
@@ -53,7 +53,7 @@ The default [NeDB](https://github.com/louischatriot/nedb) datastore is fine for 
 feathers generate service
 ```
 
-To make the Quasar app correctly contacting the backend you have to configure an API proxy in your frontend **src/config/index.js**:
+To make the Quasar app correctly contacting the backend you have to configure an API proxy in your frontend **config/index.js**:
 ```javascript
 ...
   dev: {
