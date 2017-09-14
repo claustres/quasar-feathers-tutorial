@@ -47,6 +47,9 @@ export default {
           model: ''
         }
       },
+      onDismiss: () => {
+        this.$router.push({ name: 'home' })
+      },
       buttons: [
         {
           label: 'Ok',

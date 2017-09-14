@@ -19,9 +19,9 @@ Last but not least, I assume your are familiar with the [Vue.js](https://vuejs.o
 
 ## Installation and configuration
 
-**This tutorial has been made upgraded to Quasar version 0.14.1 and Feathers version 2.1.4.**
+**This tutorial has been upgraded to Quasar version 0.14.1 and Feathers version 2.1.4 (Auk).**
 
-Some updates have been integrated to make it "work" as well with higher versions such as Feathers v 3.0.0 (Auk), but feel free to submit any problem by opening an [Issue](https://github.com/claustres/quasar-feathers-tutorial/issues) or upgrade the code with a [Pull Request](https://github.com/claustres/quasar-feathers-tutorial/pulls).
+Feel free to submit any problem by opening an [Issue](https://github.com/claustres/quasar-feathers-tutorial/issues) or upgrade the code with a [Pull Request](https://github.com/claustres/quasar-feathers-tutorial/pulls).
 
 Each framework provides its own CLI so that starting a project is easy, with a couple of instructions you have everything ready to start coding your app.
 
@@ -31,9 +31,20 @@ $ npm install -g quasar-cli
 $ quasar init quasar-feathers
 $ cd quasar-feathers
 $ npm install
-// Will launch the frontend server in dev mode on 8080
+// Will launch the frontend server in dev mode on 8080 (note: this is equivalent to: "npm run dev")
 $ quasar dev
 ```
+
+Or use "yarn" instead of npm:
+```bash
+$ yarn global add quasar-cli
+$ quasar init quasar-feathers
+$ cd quasar-feathers
+$ yarn install
+// Will launch the frontend server in dev mode on 8080
+$ yarn run dev
+```
+
 Feathers for the backend in the app root directory:
 ```bash
 $ npm install -g feathers-cli
@@ -46,6 +57,20 @@ $ feathers generate authentication
 $ feathers generate
 // Will launch the backend server in dev mode on 3030
 $ npm start
+```
+
+Or with "yarn" instead of npm:
+```bash
+$ yarn global add feathers-cli
+$ mkdir api
+$ cd api
+// For latest Feathers (Auk release)
+$ feathers generate app
+$ feathers generate authentication
+// For legacy Feathers (Pre-Auk releases)
+$ feathers generate
+// Will launch the backend server in dev mode on 3030
+$ yarn start
 ```
 
 The default [NeDB](https://github.com/louischatriot/nedb) datastore is fine for our tutorial because it does not rely on any third-party DB software to be installed. Because we generated the Feathers boilerplate with authentication we already have a **user** service providing [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations as well. But as we want to develop a chat application we miss a **message** service so we generate it in the backend folder:
@@ -131,47 +156,59 @@ From a end-user perspective the application will be simple:
  
  We update the layout of the **src/components/Index.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a profile menu with a logout entry using a [Floating Action Button](http://quasar-framework.org/components/floating-action-buttons.html), a [Sidebar menu](http://quasar-framework.org/components/drawer.html) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
  ```html
- <q-layout>
-    <div slot="header" class="toolbar">
-      <button @click="$refs.menu.open()" v-show="authenticated">
-        <i>menu</i>
+  <q-layout ref="layout">
+    <q-toolbar slot="header">
+      <q-btn flat @click="$refs.layout.toggleLeft()" v-show="authenticated">
+        <q-icon name="menu" />
         <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Menu</q-tooltip>
-      </button>
-      <q-toolbar-title :padding="0">
+      </q-btn>
+
+      <q-toolbar-title>
         Quasar + Feathers boilerplate
       </q-toolbar-title>
-      <button class="primary" @click="goTo('signin')" v-show="!authenticated">
-        Sign In
-      </button>
-      ...
-      <q-fab icon="perm_identity" direction="left" v-show="authenticated">
-        <q-small-fab class="primary" @click.native="signout" icon="exit_to_app">
-          <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Sign Out</q-tooltip>
-        </q-small-fab>
-      </q-fab>
-    </div>
 
-    <q-drawer swipe-only left-side ref="menu" v-show="authenticated">
-      <div class="toolbar light">
-        <i>menu</i>
-        <q-toolbar-title :padding="1">
-            Menu
-        </q-toolbar-title>
-      </div>
-      <q-drawer-link icon="home" to="/chat">Home</q-drawer-link>
-      <q-drawer-link icon="chat" to="/chat">Chat</q-drawer-link>
+      <q-btn flat @click="goTo('signin')" v-show="!authenticated">
+        Sign In
+      </q-btn>
+      <q-btn flat @click="goTo('register')" v-show="!authenticated">
+        Register
+      </q-btn>
+      <q-btn flat round @click="goTo('home')" v-show="authenticated">
+        <q-icon name="home" />
+        <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Home</q-tooltip>
+      </q-btn>
+      <q-btn flat round @click="goTo('chat')" v-show="authenticated">
+        <q-icon name="chat" />
+        <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Chat</q-tooltip>
+      </q-btn>
+      <q-btn flat round @click="signout" v-show="authenticated">
+        <q-icon name="exit_to_app" />
+        <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Signout</q-tooltip>
+      </q-btn>
+
+    </q-toolbar>
+
+    <div slot="left" ref="menu" v-if="authenticated">
+      <q-side-link item to="/home">
+        <q-item-side icon="home" />
+        <q-item-main label="Home"/>
+      </q-side-link>
+      <q-side-link item to="/chat">
+        <q-item-side icon="chat" />
+        <q-item-main label="Chat"/>
+      </q-side-link>
       <q-collapsible icon="info" label="About">
         <p style="padding: 25px;" class="text-grey-7">
           This is a template project combining the power of Quasar and Feathers to create real-time web apps.
         </p>
       </q-collapsible>
-    </q-drawer>
+    </div>
 
     <!-- sub-routes -->
-    <router-view class="layout-view" :user="user"></router-view>
-    
+    <router-view :user="user"></router-view>
+
   </q-layout>
- ```
+  ```
  
  We update the router configuration in **src/router.js** to reflect this as well:
  ```javascript
@@ -496,46 +533,40 @@ module.exports = {
 
 Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages. We will also use the built-in [chat list](http://quasar-framework.org/components/list.html#Chat-List) to list available people. Last, we will use a simple [text input](http://quasar-framework.org/components/input-textbox.html#Floating-Label) to send messages in the chat room. Inside the component these data are respectively stored in **$data.messages**, **$data.users**, **$data.message**. The final template of the **src/components/Chat.vue** component is thus the following:
 ```html
-<div class="layout">
-  <div class="row fit">
-    <div class="width-4of5">
-      <div v-for="message in messages" v-bind:class="messageClass(message)" style="margin: 50px;">
-        <div class="chat-user">
-          <img :src="message.user.avatar">
-        </div>
-        <div class="chat-date">
-          {{messageDate(message)}}
-        </div>
-        <div class="chat-message">
-          <p>
-            {{message.text}}
-          </p>
-        </div>
+  <div>
+    <div class="row">
+      <div class="layout-padding col-8" >
+        <q-chat-message v-for="message in messages"
+          :text="[message.text]"
+          :avatar="message.user.avatar"
+          :stamp="messageDate(message)"
+          :sent="isSent(message) ? true : false"
+        />
       </div>
-      <div class="fixed-bottom" style="border-top: 1px solid #f4f4f4; background-color: #FFF;">
-        <div class="floating-label">
-          <input required class="full-width" v-model="message" v-on:keyup.enter="send">
-          <label>Enter your message</label>
-        </div>
-      </div>
+      <q-list highlight class="col-auto">
+        <q-list-header>People</q-list-header>
+        <q-item v-for="user in users">
+          <q-item-side :avatar="user.avatar" />
+          <q-item-main>
+            <q-item-tile label>{{user.email}}</q-item-tile>
+          </q-item-main>
+          <q-item-side right>
+            <q-item-tile icon="chat_bubble" color="green" />
+          </q-item-side>
+        </q-item>
+      </q-list>
     </div>
-    <div class="list content-center">
-      <div class="list-label">People</div>
-      <div v-for="user in users" class="item">
-        <img class="item-primary" :src="user.avatar">
-        <div class="item-content has-secondary">
-          {{user.email}}
-        </div>
-        <i class="item-secondary">
-          chat_bubble
-        </i>
-      </div>
-    </div>
+    <q-input class="row col-12 fixed-bottom"
+      v-model="message"
+      v-on:keyup.enter="send"
+      type="textarea"
+      float-label="Enter your message"
+      :min-rows="1"
+    />
   </div>
-</div>
 ```
 
-As you can see we rely on the Quasar [grid layout](http://quasar-framework.org/api/css-grid-layout.html) and [positioning classes](http://quasar-framework.org/api/css-positioning.html) to make the messages fit 4/5 of the page, the user list 1/5 of the page and the message input be fixed at the bottom of the page.
+As you can see we rely on the Quasar [positioning classes](http://quasar-framework.org/components/positioning.html) to make the message input be fixed at the bottom of the page.
 
 Retrieving messages/users on mount and in real-time is a piece of cake in **src/components/Chat.vue**:
 ```javascript
