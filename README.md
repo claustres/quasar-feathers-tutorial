@@ -13,13 +13,15 @@ You can download the source code of the app [here](https://github.com/claustres/
 
 ## Disclaimer
 
-Although this tutorial details the path to create an application skeleton featuring Quasar and Feathers from scratch, as well as code details, most of this work is currently under integration in the Quasar ecosystem. Indeed, Quasar provides the **wrapper** concept which allows to plug the frontend app into a larger piece of work such as Electron or Express powered backend. The simplest way to retrieve and start with this application skeleton is to use the Quasar Feathers wrapper guide https://github.com/quasarframework/quasar-wrapper-feathersjs-api.
+Although this tutorial details the path to create an application skeleton featuring Quasar and Feathers from scratch, as well as code details, most of this work is currently under integration in the Quasar ecosystem. Indeed, Quasar provides the **wrapper** concept which allows to plug the frontend app into a larger piece of work such as Electron or Express powered backend. The simplest way to retrieve an up-to-date version and start with this application skeleton is to use the Quasar Feathers wrapper guide https://github.com/quasarframework/quasar-wrapper-feathersjs-api.
 
 Last but not least, I assume your are familiar with the [Vue.js](https://vuejs.org/) and [Node.js](https://nodejs.org) ecosystem.
 
 ## Installation and configuration
 
 **This tutorial has been upgraded to Quasar version 0.14.1 and Feathers version 2.1.4 (Auk).**
+
+This tutorial has been initially made with Quasar version 0.13.4 and Feathers version 2.1.1. You can find previous version in the [releases](https://github.com/claustres/quasar-feathers-tutorial/releases).
 
 Feel free to submit any problem by opening an [Issue](https://github.com/claustres/quasar-feathers-tutorial/issues) or upgrade the code with a [Pull Request](https://github.com/claustres/quasar-feathers-tutorial/pulls).
 
