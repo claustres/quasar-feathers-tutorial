@@ -7,10 +7,10 @@
   "scripts": {
     "dev": "nodemon --watch src --exec npm run debug",
     "predebug": "npm run build",
-    "debug": "cross-env NODE_ENV=development node --inspect --harmony_async_await dist/main.js",
+    "debug": "cross-env NODE_ENV=development node --inspect dist/main.js",
     "clean": "node build/script.clean.js",
     "build": "babel src -d dist -s",
-    "prod": "cross-env NODE_ENV=production node --harmony_async_await dist/main.js",
+    "prod": "cross-env NODE_ENV=production node dist/main.js",
     "lint": "eslint --ext .js src"
   },
   "devDependencies": {
