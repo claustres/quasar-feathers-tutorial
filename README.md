@@ -162,7 +162,7 @@ From a end-user perspective the application will be simple:
  $ quasar new Chat
  ```
  
- We update the layout of the **src/components/Index.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a profile menu with a logout entry using a [Floating Action Button](http://quasar-framework.org/components/floating-action-buttons.html), a [Sidebar menu](http://quasar-framework.org/components/drawer.html) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
+ We update the layout of the **src/components/Index.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a profile menu with a logout entry using a [Floating Action Button](http://quasar-framework.org/components/floating-action-buttons.html), a [Sidebar menu](http://quasar-framework.org/components/layout.html#Navigation-from-drawer-panels) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
  ```html
   <q-layout ref="layout">
     <q-toolbar slot="header">
@@ -299,10 +299,10 @@ export default {
 ...
   mounted () {
     Dialog.create({
-      title: 'Sign In',
+      title: this.isRegistration() ? 'Register' : 'Sign In',
       form: {
         email: {
-          type: 'textbox',
+          type: 'email',
           label: 'E-mail',
           model: ''
         },
@@ -312,21 +312,36 @@ export default {
           model: ''
         }
       },
+      onDismiss: () => {
+        this.$router.push({ name: 'home' })
+      },
       buttons: [
         {
           label: 'Ok',
           handler: (data) => {
-            api.authenticate({
-              strategy: 'local',
-              email: data.email,
-              password: data.password
-            }).then(_ => {
-              Toast.create.positive('You are now logged in')
-            })
-            .catch(_ => {
-              Toast.create.negative('Cannot sign in, please check your e-mail or password')
-              this.$router.push({ name: 'home' })
-            })
+            if (this.isRegistration()) {
+              this.register(data.email, data.password)
+                .then(() => {
+                  return this.login(data.email, data.password)
+                })
+                .then(_ => {
+                  Toast.create.positive('You are now logged in')
+                })
+                .catch(_ => {
+                  Toast.create.negative('Cannot register, please check your e-mail or password')
+                  this.$router.push({ name: 'home' })
+                })
+            }
+            else {
+              this.login(data.email, data.password)
+                .then(_ => {
+                  Toast.create.positive('You are now logged in')
+                })
+                .catch(_ => {
+                  Toast.create.negative('Cannot sign in, please check your e-mail or password')
+                  this.$router.push({ name: 'home' })
+                })
+            }
           }
         }
       ]
@@ -344,38 +359,41 @@ import api from 'src/api'
 export default {
 ...
   methods: {
+    goTo (route) {
+      this.$router.push({ name: route })
+    },
     signout () {
       api.logout()
-      .then(() => {
-        Toast.create.positive('You are now logged out, sign in again to continue to work')
-      })
-      .catch(_ => {
-        Toast.create.negative('Cannot logout, please check again in a few minutes')
-      })
+        .then(() => {
+          Toast.create.positive('You are now logged out, sign in again to continue to work')
+        })
+        .catch(_ => {
+          Toast.create.negative('Cannot logout, please check again in a few minutes')
+        })
     },
     getUser (accessToken) {
       return api.passport.verifyJWT(accessToken)
-      .then(payload => {
-        return api.service('users').get(payload.userId)
-      })
-      .then(user => {
-        this.$data.user = user
-        return user
-      })
+        .then(payload => {
+          return api.service('users').get(payload.userId)
+        })
+        .then(user => {
+          this.$data.user = user
+          return user
+        })
     }
   },
   mounted () {
     // Check if there is already a session running
     api.authenticate()
-    .then((response) => {
-      return this.getUser(response.accessToken)
-    })
-    .then(user => {
-      Toast.create.positive('Restoring previous session')
-    })
-    .catch(_ => {
-      this.$router.push({ name: 'home' })
-    })
+      .then((response) => {
+        return this.getUser(response.accessToken)
+      })
+      .then(user => {
+        Toast.create.positive('Restoring previous session')
+      })
+      .catch(_ => {
+        this.$router.push({ name: 'home' })
+      })
     // On successfull login
     api.on('authenticated', response => {
       this.getUser(response.accessToken)
@@ -394,7 +412,7 @@ export default {
 
 We make the current user available to sub components easily using a **user** [prop](https://vuejs.org/v2/guide/components.html#Props) in the index component template:
 ```html
-<router-view class="layout-view" :user="user"></router-view>
+<router-view :user="user"></router-view>
 ```
 
 ## Real-time chat
@@ -539,12 +557,12 @@ module.exports = {
 
 ### Frontend
 
-Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages. We will also use the built-in [chat list](http://quasar-framework.org/components/list.html#Chat-List) to list available people. Last, we will use a simple [text input](http://quasar-framework.org/components/input-textbox.html#Floating-Label) to send messages in the chat room. Inside the component these data are respectively stored in **$data.messages**, **$data.users**, **$data.message**. The final template of the **src/components/Chat.vue** component is thus the following:
+Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages. We will also use the built-in [list](http://quasar-framework.org/components/lists-and-list-items.html) to list available people. Last, we will use a simple [text input](http://quasar-framework.org/components/input.html#Labeling) to send messages in the chat room. Inside the component these data are respectively stored in **$data.messages**, **$data.users**, **$data.message**. The final template of the **src/components/Chat.vue** component is thus the following:
 ```html
   <div>
     <div class="row">
       <div class="layout-padding col-8" >
-        <q-chat-message v-for="message in messages"
+        <q-chat-message v-for="message in messages" 
           :text="[message.text]"
           :avatar="message.user.avatar"
           :stamp="messageDate(message)"
@@ -564,7 +582,7 @@ Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.
         </q-item>
       </q-list>
     </div>
-    <q-input class="row col-12 fixed-bottom"
+    <q-input class="row col-12 fixed-bottom" 
       v-model="message"
       v-on:keyup.enter="send"
       type="textarea"
