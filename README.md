@@ -149,7 +149,7 @@ users.on('created', user => {
 From a end-user perspective the application will be simple:
  - a menu toolbar including (**src/components/Index.vue** component)
    - a sign in/register entry when not connected
-   - home/chat entries and a profile menu to logout when connected
+   - home/chat entries and a signout menu to logout when connected
  - a sidebar menu recalling the home/chat entries and a about section
  - a landing home page displaying different text depending on the connection state (**src/components/Home.vue** component)
  - a signin/register form with email/password (**src/components/SignIn.vue** component)
@@ -162,7 +162,7 @@ From a end-user perspective the application will be simple:
  $ quasar new Chat
  ```
  
- We update the layout of the **src/components/Index.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a profile menu with a logout entry using a [Floating Action Button](http://quasar-framework.org/components/floating-action-buttons.html), a [Sidebar menu](http://quasar-framework.org/components/layout.html#Navigation-from-drawer-panels) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
+ We update the layout of the **src/components/Index.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a logout [button](http://quasar-framework.org/components/button.html), a [Sidebar menu](http://quasar-framework.org/components/layout.html#Navigation-from-drawer-panels) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
  ```html
   <q-layout ref="layout">
     <q-toolbar slot="header">
