@@ -2,7 +2,7 @@
   <div>
     <div class="row">
       <div class="layout-padding col-8" >
-        <q-chat-message v-for="message in messages" 
+        <q-chat-message v-for="message in messages" :key="message.id" 
           :text="[message.text]"
           :avatar="message.user.avatar"
           :stamp="messageDate(message)"
@@ -11,7 +11,7 @@
       </div>
       <q-list highlight class="col-auto">
         <q-list-header>People</q-list-header>
-        <q-item v-for="user in users">
+        <q-item v-for="user in users" :key="user.id">
           <q-item-side :avatar="user.avatar" />
           <q-item-main>
             <q-item-tile label>{{user.email}}</q-item-tile>

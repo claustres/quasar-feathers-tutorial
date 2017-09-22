@@ -1231,9 +1231,9 @@ fast-levenshtein@~2.0.4:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
 
-feathers-authentication-client@^0.1.10:
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/feathers-authentication-client/-/feathers-authentication-client-0.1.10.tgz#396059ec877f31d50ab5a8de0f88444c6313557a"
+feathers-authentication-client@^0.3.1:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/feathers-authentication-client/-/feathers-authentication-client-0.3.3.tgz#d2183e4b08287dfd3ecb4a96eb081cf0b4e7c263"
   dependencies:
     debug "^2.2.0"
     feathers-errors "^2.4.0"
@@ -1263,20 +1263,22 @@ feathers-authentication-local@^0.3.3:
     lodash.pick "^4.4.0"
     passport-local "^1.0.0"
 
-feathers-authentication@pre:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/feathers-authentication/-/feathers-authentication-1.2.0.tgz#e788b91acd03e5606837a7955c60216c1f8942c8"
+feathers-authentication@^1.2.0:
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/feathers-authentication/-/feathers-authentication-1.2.7.tgz#8cc5c0047f04fabfafcdf6eb392c72038817bf05"
   dependencies:
     debug "^2.2.0"
-    feathers-authentication-client "^0.1.10"
+    feathers-authentication-client "^0.3.1"
     feathers-commons "^0.8.4"
     feathers-errors "^2.4.0"
     feathers-socket-commons "^2.3.1"
     jsonwebtoken "^7.1.9"
+    lodash.clone "^4.5.0"
     lodash.merge "^4.6.0"
     lodash.omit "^4.5.0"
     lodash.pick "^4.4.0"
-    ms "^0.7.1"
+    long-timeout "^0.1.1"
+    ms "^2.0.0"
     passport "^0.3.2"
 
 feathers-commons@^0.8.0, feathers-commons@^0.8.1, feathers-commons@^0.8.4, feathers-commons@^0.8.6, feathers-commons@^0.8.7:
@@ -2158,6 +2160,10 @@ lodash.assign@^3.0.0:
     lodash._createassigner "^3.0.0"
     lodash.keys "^3.0.0"
 
+lodash.clone@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.clone/-/lodash.clone-4.5.0.tgz#195870450f5a13192478df4bc3d23d2dea1907b6"
+
 lodash.defaults@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/lodash.defaults/-/lodash.defaults-3.1.2.tgz#c7308b18dbf8bc9372d701a73493c61192bd2e2c"
@@ -2212,6 +2218,10 @@ lodash.restparam@^3.0.0:
 lodash@^4.0.0, lodash@^4.17.2, lodash@^4.2.0, lodash@^4.3.0:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
+
+long-timeout@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/long-timeout/-/long-timeout-0.1.1.tgz#9721d788b47e0bcb5a24c2e2bee1a0da55dab514"
 
 loose-envify@^1.0.0:
   version "1.3.1"
@@ -2313,6 +2323,10 @@ ms@0.7.2:
 ms@^0.7.1:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/ms/-/ms-0.7.3.tgz#708155a5e44e33f5fd0fc53e81d0d40a91be1fff"
+
+ms@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
 mute-stream@0.0.5:
   version "0.0.5"
