@@ -169,9 +169,9 @@ From a end-user perspective the application will be simple:
  
  The main app layout is already part of the Quasar default template so we will directly modify it but additional components can be generated using the CLI:
  ```bash
- $ quasar new Home
- $ quasar new SignIn
- $ quasar new Chat
+ $ quasar new component Home
+ $ quasar new component SignIn
+ $ quasar new component Chat
  ```
  
  We update the layout of the **src/components/Index.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a logout [button](http://quasar-framework.org/components/button.html), a [Sidebar menu](http://quasar-framework.org/components/layout.html#Navigation-from-drawer-panels) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
