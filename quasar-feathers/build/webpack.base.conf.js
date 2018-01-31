@@ -49,7 +49,7 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         include: projectRoot,
-        exclude: /node_modules/
+        exclude: /node_modules(\/|\\)(?!(@feathersjs))/
       },
       {
         test: /\.vue$/,

@@ -5,31 +5,32 @@ const helmet = require('helmet')
 const bodyParser = require('body-parser')
 const proxyMiddleware = require('http-proxy-middleware')
 
-const feathers = require('feathers')
-const configuration = require('feathers-configuration')
-const hooks = require('feathers-hooks')
-const rest = require('feathers-rest')
-const socketio = require('feathers-socketio')
+const feathers = require('@feathersjs/feathers')
+const express = require('@feathersjs/express');
+const configuration = require('@feathersjs/configuration')
+const rest = require('@feathersjs/express/rest')
+const socketio = require('@feathersjs/socketio')
 
 const middleware = require('./middleware')
 const services = require('./services')
+const channels = require('./channels');
 const appHooks = require('./main.hooks')
 
 const authentication = require('./authentication')
 
 export class Server {
   constructor() {
-    this.app = feathers()
+    this.app = express(feathers())
     // Load app configuration
     this.app.configure(configuration(path.join(__dirname, '..')))
 
     // Serve pure static assets
     if (process.env.NODE_ENV === 'production') {
-      this.app.use(this.app.get('client').build.publicPath, feathers.static('../dist'))
+      this.app.use(this.app.get('client').build.publicPath, express.static('../dist'))
     }
     else {
       const staticsPath = path.posix.join(this.app.get('client').dev.publicPath, 'statics/')
-      this.app.use(staticsPath, feathers.static('../client/statics'))
+      this.app.use(staticsPath, express.static('../client/statics'))
     }
 
     // Define HTTP proxies to your custom API backend. See /config/index.js -> proxyTable
@@ -49,7 +50,6 @@ export class Server {
     this.app.use(bodyParser.json())
     this.app.use(bodyParser.urlencoded({ extended: true }))
     // Set up Plugins and providers
-    this.app.configure(hooks())
     this.app.configure(rest())
     this.app.configure(socketio())
 
@@ -57,6 +57,7 @@ export class Server {
 
     // Set up our services (see `services/index.js`)
     this.app.configure(services)
+    this.app.configure(channels);
     // Configure middleware (see `middleware/index.js`) - always has to be last
     this.app.configure(middleware)
     this.app.hooks(appHooks)
@@ -64,7 +65,7 @@ export class Server {
 
   run () {
     const port = this.app.get('port');
-    
+
     let promise = new Promise((resolve, reject) => {
       this.app.listen(port, (err) => {
         if (err) {

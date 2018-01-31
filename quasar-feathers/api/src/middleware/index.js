@@ -1,4 +1,4 @@
-const handler = require('feathers-errors/handler')
+const handler = require('@feathersjs/express/errors')
 const notFound = require('feathers-errors/not-found')
 
 module.exports = function() {

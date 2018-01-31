@@ -37,7 +37,7 @@ Last but not least, I assume your are familiar with the [Vue.js](https://vuejs.o
 
 ## Installation and configuration
 
-**This tutorial has been upgraded to Quasar version 0.14.1 and Feathers version 2.1.4 (Auk).**
+**This tutorial has been upgraded to Quasar version 0.14.7 and Feathers version 3.0.5 (Buzzard).**
 
 This tutorial has been initially made with Quasar version 0.13.4 and Feathers version 2.1.1. You can find previous version in the [releases](https://github.com/claustres/quasar-feathers-tutorial/releases).
 
@@ -55,14 +55,9 @@ $ npm install
 $ quasar dev
 ```
 
-Or use "yarn" instead of npm:
+Or run it with npm instead of quasar:
 ```bash
-$ yarn global add quasar-cli
-$ quasar init quasar-feathers
-$ cd quasar-feathers
-$ yarn install
-// Will launch the frontend server in dev mode on 8080
-$ yarn run dev
+$ npm run dev
 ```
 
 Feathers for the backend in the app root directory:
@@ -77,20 +72,6 @@ $ feathers generate authentication
 $ feathers generate
 // Will launch the backend server in dev mode on 3030
 $ npm start
-```
-
-Or with "yarn" instead of npm:
-```bash
-$ yarn global add feathers-cli
-$ mkdir api
-$ cd api
-// For latest Feathers (Auk release)
-$ feathers generate app
-$ feathers generate authentication
-// For legacy Feathers (Pre-Auk releases)
-$ feathers generate
-// Will launch the backend server in dev mode on 3030
-$ yarn start
 ```
 
 The default [NeDB](https://github.com/louischatriot/nedb) datastore is fine for our tutorial because it does not rely on any third-party DB software to be installed. Because we generated the Feathers boilerplate with authentication we already have a **user** service providing [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations as well. But as we want to develop a chat application we miss a **message** service so we generate it in the backend folder:
