@@ -39,6 +39,8 @@ Last but not least, I assume your are familiar with the [Vue.js](https://vuejs.o
 
 **This tutorial has been upgraded to Quasar version 0.14.7 and Feathers version 3.0.5 (Buzzard).**
 
+The way we did the migration to the new Feathers and Quasar is detailed in [this](https://medium.com/@leob6/feathers-buzzard-a-short-migration-guide-61182cf8361e) blog article.
+
 This tutorial has been initially made with Quasar version 0.13.4 and Feathers version 2.1.1. You can find previous version in the [releases](https://github.com/claustres/quasar-feathers-tutorial/releases).
 
 Feel free to submit any problem by opening an [Issue](https://github.com/claustres/quasar-feathers-tutorial/issues) or upgrade the code with a [Pull Request](https://github.com/claustres/quasar-feathers-tutorial/pulls).
