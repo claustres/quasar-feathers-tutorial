@@ -37,7 +37,7 @@ Last but not least, I assume your are familiar with the [Vue.js](https://vuejs.o
 
 ## Installation and configuration
 
-**This tutorial has been upgraded to Quasar version 0.14.7 and Feathers version 3.0.5 (Buzzard).**
+**This tutorial has been upgraded to Quasar version 0.14.7 and Feathers version 3.1.0 (Buzzard).**
 
 The way we did the migration to the new Feathers and Quasar is detailed in [this](https://medium.com/@leob6/feathers-buzzard-a-short-migration-guide-61182cf8361e) blog article.
 
