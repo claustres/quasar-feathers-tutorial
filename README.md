@@ -98,16 +98,14 @@ To make the Quasar app correctly contacting the backend you have to configure an
 
 Feathers provides you with a thin layer on the client-side to make API authentication and calls so simple. We create a new **src/api.js** file in the frontend to handle the glue with the API:
 ```javascript
-import feathers from 'feathers'
-import hooks from 'feathers-hooks'
-import socketio from 'feathers-socketio'
-import auth from 'feathers-authentication-client'
+import feathers from '@feathersjs/feathers'
+import socketio from '@feathersjs/socketio-client'
+import auth from '@feathersjs/authentication-client'
 import io from 'socket.io-client'
 
 const socket = io('http://localhost:3030', {transports: ['websocket']})
 
 const api = feathers()
-  .configure(hooks())
   .configure(socketio(socket))
   .configure(auth({ storage: window.localStorage }))
 
@@ -255,9 +253,9 @@ From a end-user perspective the application will be simple:
 
 In the boilerplate a [local authentication strategy](https://docs.feathersjs.com/authentication/local.html) has been setup based on a [JSON Web Token](https://docs.feathersjs.com/authentication/token.html) in **api/src/authentication.js**:
 ```javascript
-const authentication = require('feathers-authentication')
-const jwt = require('feathers-authentication-jwt')
-const local = require('feathers-authentication-local')
+const authentication = require('@feathersjs/authentication')
+const jwt = require('@feathersjs/authentication-jwt')
+const local = require('@feathersjs/authentication-local')
 
 module.exports = function() {
   const app = this
@@ -464,7 +462,7 @@ module.exports = function() {
 ```
 We include this hook for our messages, as well as the one for authentication and the one to automatically populate the user that created the message, in **api/src/services/messages/messages.hooks.js**:
 ```javascript
-const { authenticate } = require('feathers-authentication').hooks
+const { authenticate } = require('@feathersjs/authentication').hooks
 const { populate } = require('feathers-hooks-common')
 const processMessage = require('../../hooks/process-message')
 
@@ -524,8 +522,8 @@ module.exports = function() {
 ```
 We include this hook for our users, as well as the one for authentication (except to be able to create a user when registering), in **api/src/services/users/users.hooks.js**:
 ```javascript
-const { authenticate } = require('feathers-authentication').hooks
-const { hashPassword } = require('feathers-authentication-local').hooks
+const { authenticate } = require('@feathersjs/authentication').hooks
+const { hashPassword, protect } = require('@feathersjs/authentication-local').hooks;
 const commonHooks  = require('feathers-hooks-common')
 const gravatar = require('../../hooks/gravatar')
 
@@ -540,7 +538,12 @@ module.exports = {
     remove: [ authenticate('jwt') ]
   },
   after: {
-    all: [commonHooks.when(hook => hook.params.provider, commonHooks.discard('password'))],
+    all: [
+      commonHooks.when(
+        hook => hook.params.provider,
+        protect('password')
+      )
+    ],
     ...
   },
   error: {
