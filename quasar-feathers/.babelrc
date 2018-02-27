@@ -1,5 +1,25 @@
 {
-  "presets": [["es2015"], "stage-2"],
-  "plugins": ["transform-runtime", "add-module-exports", "transform-export-extensions"],
+  "presets": [
+    [
+      "env",
+      {
+        "loose": true,
+        "modules": false,
+        "targets": {
+          "browsers": ["> 1%"]
+        },
+        "exclude": [
+          "transform-es2015-typeof-symbol"
+        ]
+      }
+    ]
+  ],
+  "plugins": [
+    "syntax-dynamic-import",
+    "transform-decorators-legacy",
+    "transform-object-assign",
+    "transform-class-properties",
+    "transform-object-rest-spread"
+  ],
   "comments": false
 }
