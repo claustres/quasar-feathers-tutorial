@@ -1,25 +1,8 @@
 {
   "presets": [
-    [
-      "env",
-      {
-        "loose": true,
-        "modules": false,
-        "targets": {
-          "browsers": ["> 1%"]
-        },
-        "exclude": [
-          "transform-es2015-typeof-symbol"
-        ]
-      }
-    ]
+    [ "env", {"modules": false} ],
+    "stage-2"
   ],
-  "plugins": [
-    "syntax-dynamic-import",
-    "transform-decorators-legacy",
-    "transform-object-assign",
-    "transform-class-properties",
-    "transform-object-rest-spread"
-  ],
+  "plugins": ["transform-runtime"],
   "comments": false
 }

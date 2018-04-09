@@ -37,9 +37,7 @@ Last but not least, I assume your are familiar with the [Vue.js](https://vuejs.o
 
 ## Installation and configuration
 
-**This tutorial has been upgraded to Quasar version 0.14.7 and Feathers version 3.1.0 (Buzzard).**
-
-The way we did the migration to the new Feathers and Quasar is detailed in [this](https://medium.com/@leob6/feathers-buzzard-a-short-migration-guide-61182cf8361e) blog article.
+**This tutorial has been upgraded to Quasar version 0.15.10 and Feathers version 3.1.0 (Buzzard).**
 
 This tutorial has been initially made with Quasar version 0.13.4 and Feathers version 2.1.1. You can find previous version in the [releases](https://github.com/claustres/quasar-feathers-tutorial/releases).
 
@@ -53,13 +51,8 @@ $ npm install -g quasar-cli
 $ quasar init quasar-feathers
 $ cd quasar-feathers
 $ npm install
-// Will launch the frontend server in dev mode on 8080 (note: this is equivalent to: "npm run dev")
+// Will launch the frontend server in dev mode on 8080
 $ quasar dev
-```
-
-Or run it with npm instead of quasar:
-```bash
-$ npm run dev
 ```
 
 Feathers for the backend in the app root directory:

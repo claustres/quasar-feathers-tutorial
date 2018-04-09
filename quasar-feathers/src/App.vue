@@ -1,21 +1,36 @@
 <template>
-  <!-- Don't drop "q-app" class -->
   <div id="q-app">
-    <q-ajax-bar ref="bar" position="bottom" size="8" color="primary"></q-ajax-bar>
     <router-view />
   </div>
 </template>
 
 <script>
-  import {
-    QAjaxBar
-  } from 'quasar'
-
 export default {
-  components: {
-    QAjaxBar
-  }
+  name: 'App'
 }
 </script>
 
-<style></style>
+<style lang="styl">
+  @import '~variables'
+
+  $link-color          ?= lighten($primary, 25%)
+  $link-color-active   ?= $primary
+
+  a
+    color $link-color
+    text-decoration none
+    cursor pointer
+    outline 0
+    transition color .25s
+    &:hover
+      color $link-color-active
+    &:active, &:hover
+      outline-width 0
+
+  .modal-header
+    padding-bottom 20px
+
+  .modal-body
+    padding-bottom 20px
+
+</style>

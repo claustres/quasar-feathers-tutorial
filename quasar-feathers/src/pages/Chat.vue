@@ -1,63 +1,45 @@
 <template>
-  <div>
-    <div class="row">
-      <div class="layout-padding col-8" >
-        <q-chat-message v-for="message in messages" :key="message.id" 
-          :text="[message.text]"
-          :avatar="message.user.avatar"
-          :stamp="messageDate(message)"
-          :sent="isSent(message) ? true : false"
-        />
+  <q-page class="flex flex-center">
+      <div class="row">
+        <div class="layout-padding col-8" >
+          <q-chat-message v-for="message in messages" :key="message.id"
+            :text="[message.text]"
+            :avatar="message.user.avatar"
+            :stamp="messageDate(message)"
+            :sent="isSent(message) ? true : false"
+          />
+        </div>
+        <q-list highlight class="col-auto">
+          <q-list-header>People</q-list-header>
+          <q-item v-for="user in users" :key="user.id">
+            <q-item-side :avatar="user.avatar" />
+            <q-item-main>
+              <q-item-tile label>{{user.email}}</q-item-tile>
+            </q-item-main>
+            <q-item-side right>
+              <q-item-tile icon="chat_bubble" color="green" />
+            </q-item-side>
+          </q-item>
+        </q-list>
       </div>
-      <q-list highlight class="col-auto">
-        <q-list-header>People</q-list-header>
-        <q-item v-for="user in users" :key="user.id">
-          <q-item-side :avatar="user.avatar" />
-          <q-item-main>
-            <q-item-tile label>{{user.email}}</q-item-tile>
-          </q-item-main>
-          <q-item-side right>
-            <q-item-tile icon="chat_bubble" color="green" />
-          </q-item-side>
-        </q-item>
-      </q-list>
-    </div>
-    <q-input class="row col-12 fixed-bottom" 
-      v-model="message"
-      v-on:keyup.enter="send"
-      type="textarea"
-      float-label="Enter your message"
-      :min-rows="1"
-    />
-  </div>
+    <q-input
+        class="row col-12 fixed-bottom chat-message"
+        style="z-index: 1001; margin-top: 16px; margin-bottom: 8px;"
+        v-model="message"
+        v-on:keyup.enter="send"
+        type="textarea"
+        float-label="Enter your message"
+        :min-rows="1"
+      />
+  </q-page>
 </template>
 
 <script>
-import {
-  QInput,
-  QList,
-  QListHeader,
-  QItem,
-  QItemTile,
-  QItemMain,
-  QItemSide,
-  QChatMessage
-} from 'quasar'
 import moment from 'moment'
 import api from 'src/api'
 
 export default {
   name: 'chat',
-  components: {
-    QInput,
-    QList,
-    QListHeader,
-    QItem,
-    QItemTile,
-    QItemMain,
-    QItemSide,
-    QChatMessage
-  },
   props: ['user'],
   data () {
     return {
@@ -120,5 +102,8 @@ export default {
 </script>
 
 <style lang="styl">
-
+  .chat-message .q-input-area {
+    min-height: 19px !important;
+    height: 19px !important;
+  }
 </style>
