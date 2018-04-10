@@ -133,112 +133,124 @@ users.on('created', user => {
 ## Main layout
 
 From a end-user perspective the application will be simple:
- - a menu toolbar including (**src/components/Index.vue** component)
+ - a menu toolbar including (**src/layouts/default.vue** component)
    - a sign in/register entry when not connected
    - home/chat entries and a signout menu to logout when connected
  - a sidebar menu recalling the home/chat entries and a about section
- - a landing home page displaying different text depending on the connection state (**src/components/Home.vue** component)
- - a signin/register form with email/password (**src/components/SignIn.vue** component)
- - a chat view listing available users and providing real-time messages read/write (**src/components/Chat.vue** component)
+ - a landing home page displaying different text depending on the connection state (**src/pages/Home.vue** component)
+ - a signin/register form with email/password (**src/pages/SignIn.vue** component)
+ - a chat view listing available users and providing real-time messages read/write (**src/pages/Chat.vue** component)
  
  The main app layout is already part of the Quasar default template so we will directly modify it but additional components can be generated using the CLI:
  ```bash
- $ quasar new component Home
- $ quasar new component SignIn
- $ quasar new component Chat
+ $ quasar new page Home
+ $ quasar new page SignIn
+ $ quasar new page Chat
  ```
  
- We update the layout of the **src/components/Index.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a logout [button](http://quasar-framework.org/components/button.html), a [Sidebar menu](http://quasar-framework.org/components/layout.html#Navigation-from-drawer-panels) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
+ We update the layout of the **src/layouts/default.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a logout [button](http://quasar-framework.org/components/button.html), a [Sidebar menu](http://quasar-framework.org/components/layout.html#Navigation-from-drawer-panels) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
  ```html
-  <q-layout ref="layout">
-    <q-toolbar slot="header">
-      <q-btn flat @click="$refs.layout.toggleLeft()" v-show="authenticated">
-        <q-icon name="menu" />
-        <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Menu</q-tooltip>
-      </q-btn>
+  <q-layout>
+    <q-layout-header>
+      <q-toolbar
+        color="primary"
+        :glossy="false"
+        :inverted="$q.theme === 'ios'"
+      >
+        <q-btn
+          flat
+          dense
+          round
+          aria-label="Menu"
+          @click="leftDrawerOpen = !leftDrawerOpen"
+          v-show="authenticated"
+        >
+          <q-icon name="menu" />
+        </q-btn>
 
-      <q-toolbar-title>
-        Quasar + Feathers boilerplate
-      </q-toolbar-title>
+        <q-toolbar-title>
+          Quasar + Feathers boilerplate
+        </q-toolbar-title>
 
-      <q-btn flat @click="goTo('signin')" v-show="!authenticated">
-        Sign In
-      </q-btn>
-      <q-btn flat @click="goTo('register')" v-show="!authenticated">
-        Register
-      </q-btn>
-      <q-btn flat round @click="goTo('home')" v-show="authenticated">
-        <q-icon name="home" />
-        <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Home</q-tooltip>
-      </q-btn>
-      <q-btn flat round @click="goTo('chat')" v-show="authenticated">
-        <q-icon name="chat" />
-        <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Chat</q-tooltip>
-      </q-btn>
-      <q-btn flat round @click="signout" v-show="authenticated">
-        <q-icon name="exit_to_app" />
-        <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Signout</q-tooltip>
-      </q-btn>
+        <q-btn flat @click="goTo('signin')" v-show="!authenticated">
+          Sign In
+        </q-btn>
+        <q-btn flat @click="goTo('register')" v-show="!authenticated">
+          Register
+        </q-btn>
+        <q-btn flat round @click="goTo('home')" v-show="authenticated">
+          <q-icon name="home" />
+          <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Home</q-tooltip>
+        </q-btn>
+        <q-btn flat round @click="goTo('chat')" v-show="authenticated">
+          <q-icon name="chat" />
+          <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Chat</q-tooltip>
+        </q-btn>
+        <q-btn flat round @click="signout" v-show="authenticated">
+          <q-icon name="exit_to_app" />
+          <q-tooltip anchor="bottom middle" self="top middle" :offset="[0, 20]">Signout</q-tooltip>
+        </q-btn>
 
-    </q-toolbar>
+      </q-toolbar>
+    </q-layout-header>
 
-    <div slot="left" ref="menu" v-if="authenticated">
-      <q-side-link item to="/home">
-        <q-item-side icon="home" />
-        <q-item-main label="Home"/>
-      </q-side-link>
-      <q-side-link item to="/chat">
-        <q-item-side icon="chat" />
-        <q-item-main label="Chat"/>
-      </q-side-link>
-      <q-collapsible icon="info" label="About">
-        <p style="padding: 25px;" class="text-grey-7">
-          This is a template project combining the power of Quasar and Feathers to create real-time web apps.
-        </p>
-      </q-collapsible>
-    </div>
+    <q-layout-drawer
+      v-model="leftDrawerOpen"
+      v-show="authenticated"
+      no-hide-on-route-change
+      :content-class="$q.theme === 'mat' ? 'bg-grey-2' : null">
 
-    <!-- sub-routes -->
-    <router-view :user="user"></router-view>
+      <q-list
+        no-border
+        link
+        inset-delimiter
+      >
 
+        <q-item to="/home">
+          <q-item-side icon="home" />
+          <q-item-main label="Home" />
+        </q-item>
+
+        <q-item to="/chat">
+          <q-item-side icon="chat" />
+          <q-item-main label="Chat" />
+        </q-item>
+
+        <q-collapsible icon="info" label="About">
+          <p style="padding: 25px;" class="text-grey-7">
+            This is a template project combining the power of Quasar and Feathers to create real-time web apps.
+          </p>
+        </q-collapsible>
+
+      </q-list>
+    </q-layout-drawer>
+
+    <q-page-container>
+      <router-view :user="user"></router-view>
+    </q-page-container>
   </q-layout>
   ```
  
- We update the router configuration in **src/router.js** to reflect this as well:
- ```javascript
- routes: [
-    {
-      path: '/',
-      component: load('Index'),
-      children: [
-        {
-          path: '/home',
-          name: 'home',
-          component: load('Home')
-        },
-        {
-          path: '/signin',
-          name: 'signin',
-          component: load('SignIn')
-        },
-        {
-          path: '/register',
-          name: 'register',
-          component: load('SignIn')
-        },
-        {
-          path: '/chat',
-          name: 'chat',
-          component: load('Chat')
-        }
-      ]
-    },
-    {
-      path: '*',
-      component: load('Error404')
-    } // Not found
-  ]
- ```
+ We update the router configuration in **src/router/routes.js** to reflect this as well:
+```javascript
+export default [
+  {
+    path: '/',
+    component: () => import('layouts/default'),
+    children: [
+      { path: '/home', name: 'home', component: () => import('pages/Home') },
+      { path: '/signin', name: 'signin', component: () => import('pages/SignIn') },
+      { path: '/register', name: 'register', component: () => import('pages/SignIn') },
+      { path: '/chat', name: 'chat', component: () => import('pages/Chat') }
+    ]
+  },
+
+  { // Always leave this as last one
+    path: '*',
+    component: () => import('pages/404')
+  }
+]
+```
  
 ## Authentication
 
@@ -278,72 +290,124 @@ module.exports = function() {
 
 On the frontend we setup the **src/components/SignIn.vue** component as a [basic dialog](http://quasar-framework.org/components/dialog.html) with e-mail/password inputs:
 ```javascript
-import { Toast, Dialog } from 'quasar'
+<template>
+  <q-page class="flex flex-center">
+    <q-dialog v-model="showDialog" :title="title" @ok="onOk" @hide="onHide" >
+      <div slot="body">
+        <div class="row q-mb-md">
+          <q-input
+            v-model="email" type="email" name="email" stack-label="E-mail" class="full-width" autofocus
+          />
+        </div>
+        <div class="row">
+          <q-input
+            v-model="password" type="password" name="email" stack-label="Password" class="full-width"
+          />
+        </div>
+      </div>
+    </q-dialog>
+  </q-page>
+</template>
+
+<script>
 import api from 'src/api'
 
 export default {
-...
+  data () {
+    return {
+      showDialog: true,
+      email: null,
+      password: null,
+      title: null
+    }
+  },
+  computed: {
+  },
+  methods: {
+    goHome() {
+      this.$router.push({ name: 'home' })
+    },
+    onHide() {
+      // Workaround needed because of timing issues (sequencing of 'hide' and 'ok' events) ...
+      setTimeout(() => {
+        this.goHome()
+      }, 50)
+
+    },
+    onOk(data) {
+      if (this.isRegistration()) {
+        this.register(this.email, this.password)
+          .then(() => {
+            return this.login(this.email, this.password)
+          })
+          .then(_ => {
+            this.$q.notify({type: 'positive', message: 'You are now logged in'})
+          })
+          .catch(_ => {
+            this.$q.notify({type: 'positive', message: 'Cannot register, please check your e-mail or password'})
+            this.goHome()
+          })
+      } else {
+        this.login(this.email, this.password)
+          .then(_ => {
+            this.$q.notify({type: 'positive', message: 'You are now logged in'})
+          })
+          .catch(_ => {
+            this.$q.notify({type: 'positive', message: 'Cannot sign in, please check your e-mail or password'})
+            this.goHome()
+          })
+      }
+    },
+    isRegistration () {
+      return this.$route.name === 'register'
+    },
+    register (email, password) {
+      return api.service('users').create({
+        email: email,
+        password: password
+      })
+    },
+    login (email, password) {
+      return api.authenticate({
+        strategy: 'local',
+        email: email,
+        password: password
+      })
+    }
+  },
   mounted () {
-    Dialog.create({
-      title: this.isRegistration() ? 'Register' : 'Sign In',
-      form: {
-        email: {
-          type: 'email',
-          label: 'E-mail',
-          model: ''
-        },
-        password: {
-          type: 'password',
-          label: 'Password',
-          model: ''
-        }
-      },
-      onDismiss: () => {
-        this.$router.push({ name: 'home' })
-      },
-      buttons: [
-        {
-          label: 'Ok',
-          handler: (data) => {
-            if (this.isRegistration()) {
-              this.register(data.email, data.password)
-                .then(() => {
-                  return this.login(data.email, data.password)
-                })
-                .then(_ => {
-                  Toast.create.positive('You are now logged in')
-                })
-                .catch(_ => {
-                  Toast.create.negative('Cannot register, please check your e-mail or password')
-                  this.$router.push({ name: 'home' })
-                })
-            }
-            else {
-              this.login(data.email, data.password)
-                .then(_ => {
-                  Toast.create.positive('You are now logged in')
-                })
-                .catch(_ => {
-                  Toast.create.negative('Cannot sign in, please check your e-mail or password')
-                  this.$router.push({ name: 'home' })
-                })
-            }
-          }
-        }
-      ]
-    })
+    this.title = this.isRegistration() ? 'Register' : 'Sign In'
+  },
+  beforeDestroy () {
   }
-...
-```
-The final version will manage registration as well depending on the route used to reach the component but you've got the idea.
+}
+</script>
 
-Once connected the user should land on the home page then be able to navigate in the app, so that in the main layout we have to track the login state as the currently connected user in **$data.user** (null if not logged in). We will also manage logout from the profile menu entry and restoring the previous session if any by trying to authenticate on mounting **src/components/Index.vue**:
+<style lang="styl">
+</style>
+```
+
+We manage registration as well as login depending on the route used to reach the component.
+
+Once connected the user should land on the home page then be able to navigate in the app, so that in the main layout we have to track the login state as the currently connected user in **$data.user** (null if not logged in). We will also manage logout from the profile menu entry and restoring the previous session if any by trying to authenticate on mounting **src/layouts/default.vue**:
 ```javascript
-import { Toast } from 'quasar'
 import api from 'src/api'
 
 export default {
-...
+  name: 'index',
+  components: {
+  },
+  data () {
+    return {
+      leftDrawerOpen: this.$q.platform.is.desktop,
+      user: null
+    }
+  },
+  computed: {
+    authenticated () {
+      return this.$data.user !== null
+    }
+  },
   methods: {
     goTo (route) {
       this.$router.push({ name: route })
@@ -351,52 +415,54 @@ export default {
     signout () {
       api.logout()
         .then(() => {
-          Toast.create.positive('You are now logged out, sign in again to continue to work')
+          this.$q.notify({type: 'positive', message: 'You are now logged out, sign in again to continue to work'})
         })
-        .catch(_ => {
-          Toast.create.negative('Cannot logout, please check again in a few minutes')
+        .catch(() => {
+            this.$q.notify({type: 'positive', message: 'Cannot logout, please check again in a few minutes'})
         })
     },
     getUser (accessToken) {
       return api.passport.verifyJWT(accessToken)
-        .then(payload => {
+          .then(payload => {
           return api.service('users').get(payload.userId)
         })
-        .then(user => {
-          this.$data.user = user
-          return user
-        })
+    .then(user => {
+        this.$data.user = user
+      return user
+    })
     }
   },
   mounted () {
     // Check if there is already a session running
     api.authenticate()
       .then((response) => {
-        return this.getUser(response.accessToken)
-      })
-      .then(user => {
-        Toast.create.positive('Restoring previous session')
-      })
-      .catch(_ => {
-        this.$router.push({ name: 'home' })
-      })
+      return this.getUser(response.accessToken)
+    })
+  .then(user => {
+      this.$q.notify({type: 'positive', message: 'Restoring previous session'})
+  })
+  .catch(() => {
+      this.$router.push({ name: 'home' })
+  })
     // On successfull login
     api.on('authenticated', response => {
       this.getUser(response.accessToken)
       .then(user => {
-        this.$router.push({ name: 'home' })
-      })
-    })
+      this.$router.push({ name: 'home' })
+  })
+  })
     // On logout
     api.on('logout', () => {
       this.$data.user = null
-      this.$router.push({ name: 'home' })
-    })
+    this.$router.push({ name: 'home' })
+  })
+  },
+  beforeDestroy () {
   }
-...
+}
 ```
 
-We make the current user available to sub components easily using a **user** [prop](https://vuejs.org/v2/guide/components.html#Props) in the index component template:
+We make the current user available to sub components easily using a **user** [prop](https://vuejs.org/v2/guide/components.html#Props) in the default layout template:
 ```html
 <router-view :user="user"></router-view>
 ```
@@ -550,37 +616,39 @@ module.exports = {
 
 Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages. We will also use the built-in [list](http://quasar-framework.org/components/lists-and-list-items.html) to list available people. Last, we will use a simple [text input](http://quasar-framework.org/components/input.html#Labeling) to send messages in the chat room. Inside the component these data are respectively stored in **$data.messages**, **$data.users**, **$data.message**. The final template of the **src/components/Chat.vue** component is thus the following:
 ```html
-  <div>
-    <div class="row">
-      <div class="layout-padding col-8" >
-        <q-chat-message v-for="message in messages" 
-          :text="[message.text]"
-          :avatar="message.user.avatar"
-          :stamp="messageDate(message)"
-          :sent="isSent(message) ? true : false"
-        />
+  <q-page class="flex flex-center">
+      <div class="row">
+        <div class="layout-padding col-8" >
+          <q-chat-message v-for="message in messages" :key="message.id"
+            :text="[message.text]"
+            :avatar="message.user.avatar"
+            :stamp="messageDate(message)"
+            :sent="isSent(message) ? true : false"
+          />
+        </div>
+        <q-list highlight class="col-auto">
+          <q-list-header>People</q-list-header>
+          <q-item v-for="user in users" :key="user.id">
+            <q-item-side :avatar="user.avatar" />
+            <q-item-main>
+              <q-item-tile label>{{user.email}}</q-item-tile>
+            </q-item-main>
+            <q-item-side right>
+              <q-item-tile icon="chat_bubble" color="green" />
+            </q-item-side>
+          </q-item>
+        </q-list>
       </div>
-      <q-list highlight class="col-auto">
-        <q-list-header>People</q-list-header>
-        <q-item v-for="user in users">
-          <q-item-side :avatar="user.avatar" />
-          <q-item-main>
-            <q-item-tile label>{{user.email}}</q-item-tile>
-          </q-item-main>
-          <q-item-side right>
-            <q-item-tile icon="chat_bubble" color="green" />
-          </q-item-side>
-        </q-item>
-      </q-list>
-    </div>
-    <q-input class="row col-12 fixed-bottom" 
-      v-model="message"
-      v-on:keyup.enter="send"
-      type="textarea"
-      float-label="Enter your message"
-      :min-rows="1"
-    />
-  </div>
+    <q-input
+        class="row col-12 fixed-bottom chat-message"
+        style="z-index: 1001; margin-top: 16px; margin-bottom: 8px;"
+        v-model="message"
+        v-on:keyup.enter="send"
+        type="textarea"
+        float-label="Enter your message"
+        :min-rows="1"
+      />
+  </q-page>
 ```
 
 As you can see we rely on the Quasar [positioning classes](http://quasar-framework.org/components/positioning.html) to make the message input be fixed at the bottom of the page.
@@ -599,21 +667,23 @@ Retrieving messages/users on mount and in real-time is a piece of cake in **src/
         $limit: 25
       }
     })
-    .then((response) => {
-      // We want the latest messages but in the reversed order
-      this.$data.messages = response.data.reverse()
-    })
+      .then((response) => {
+        // We want the latest messages but in the reversed order
+        this.$data.messages = response.data.reverse()
+      })
     users.find()
-    .then((response) => {
-      this.$data.users = response.data
-    })
+      .then((response) => {
+        this.$data.users = response.data
+      })
 
     // Add new messages to the message list
     messages.on('created', message => {
+      console.log('message received')
       this.$data.messages.unshift(message)
     })
     // Add new users to the user list
     users.on('created', user => {
+      console.log('user received')
       this.$data.users = this.$data.users.concat(user)
     })
   }
