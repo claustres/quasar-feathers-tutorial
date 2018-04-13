@@ -74,6 +74,23 @@ The default [NeDB](https://github.com/louischatriot/nedb) datastore is fine for 
 feathers generate service
 ```
 
+Provide the following answers after issuing the ```feathers generate service``` command:
+
+```
+$ feathers generate service
+? What kind of service is it? NeDB
+? What is the name of the service? messages
+? Which path should the service be registered on? /messages
+? Does the service require authentication? Yes
+? What is the database connection string? nedb://../data
+force config/default.json
+create src/services/messages/messages.service.js
+force src/services/index.js
+create src/models/messages.model.js
+create src/services/messages/messages.hooks.js
+create test/services/messages.test.js
+```
+
 To make the Quasar app correctly contacting the backend you have to configure an API proxy in your frontend **config/index.js**:
 ```javascript
 ...
