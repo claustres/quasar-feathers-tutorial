@@ -77,7 +77,6 @@ feathers generate service
 Provide the following answers after issuing the ```feathers generate service``` command:
 
 ```
-$ feathers generate service
 ? What kind of service is it? NeDB
 ? What is the name of the service? messages
 ? Which path should the service be registered on? /messages
