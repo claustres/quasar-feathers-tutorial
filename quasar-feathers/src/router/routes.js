@@ -1,4 +1,3 @@
-
 export default [
   {
     path: '/',
@@ -7,7 +6,7 @@ export default [
       { path: '/home', name: 'home', component: () => import('pages/Home') },
       { path: '/signin', name: 'signin', component: () => import('pages/SignIn') },
       { path: '/register', name: 'register', component: () => import('pages/SignIn') },
-      { path: '/chat', name: 'chat', component: () => import('pages/Chat') }
+      { path: '/chat', name: 'chat', component: () => import('pages/Chat'), meta: { requiresAuth: true } }
     ]
   },
 

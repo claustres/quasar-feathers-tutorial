@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-      <div class="row">
+      <div class="row full-width">
         <div class="layout-padding col-8" >
           <q-chat-message v-for="message in messages" :key="message.id"
             :text="[message.text]"

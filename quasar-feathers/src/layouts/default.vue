@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import api from 'src/api'
+import auth from 'src/auth'
 
 export default {
   name: 'index',
@@ -103,7 +103,7 @@ export default {
       this.$router.push({ name: route })
     },
     signout () {
-      api.logout()
+      auth.signout()
         .then(() => {
           this.$q.notify({type: 'positive', message: 'You are now logged out, sign in again to continue to work'})
         })
@@ -111,41 +111,33 @@ export default {
             this.$q.notify({type: 'positive', message: 'Cannot logout, please check again in a few minutes'})
         })
     },
-    getUser (accessToken) {
-      return api.passport.verifyJWT(accessToken)
-          .then(payload => {
-          return api.service('users').get(payload.userId)
-        })
-    .then(user => {
-        this.$data.user = user
-      return user
-    })
+    setUser (user) {
+      this.$data.user = user
     }
   },
   mounted () {
     // Check if there is already a session running
-    api.authenticate()
-      .then((response) => {
-      return this.getUser(response.accessToken)
-    })
-  .then(user => {
+    auth.authenticate()
+    .then((user) => {
+      this.setUser(user)
       this.$q.notify({type: 'positive', message: 'Restoring previous session'})
-  })
-  .catch(() => {
+    })
+    .catch(_ => {
+      this.setUser(null)
       this.$router.push({ name: 'home' })
-  })
-    // On successfull login
-    api.on('authenticated', response => {
-      this.getUser(response.accessToken)
-      .then(user => {
+    })
+
+    // On successful login
+    auth.onAuthenticated((user) => {
+      this.setUser(user)
       this.$router.push({ name: 'home' })
-  })
-  })
+    })
+
     // On logout
-    api.on('logout', () => {
-      this.$data.user = null
-    this.$router.push({ name: 'home' })
-  })
+    auth.onLogout(() => {
+      this.setUser(null)
+      this.$router.push({ name: 'home' })
+    })
   },
   beforeDestroy () {
   }

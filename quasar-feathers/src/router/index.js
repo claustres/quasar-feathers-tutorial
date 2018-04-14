@@ -2,10 +2,11 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import routes from './routes'
+import auth from 'src/auth'
 
 Vue.use(VueRouter)
 
-const Router = new VueRouter({
+const router = new VueRouter({
   /*
    * NOTE! Change Vue Router mode from quasar.conf.js -> build -> vueRouterMode
    *
@@ -21,4 +22,15 @@ const Router = new VueRouter({
   routes
 })
 
-export default Router
+router.beforeEach((to, from, next) => {
+
+  if (!to.meta.requiresAuth || auth.authenticated()) {
+    next()
+  } else {
+    console.log('Not authenticated')
+
+    next({ path: '/home' })
+  }
+})
+
+export default router

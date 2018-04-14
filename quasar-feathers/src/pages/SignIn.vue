@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import api from 'src/api'
+import auth from 'src/auth'
 
 export default {
   data () {
@@ -70,17 +70,10 @@ export default {
       return this.$route.name === 'register'
     },
     register (email, password) {
-      return api.service('users').create({
-        email: email,
-        password: password
-      })
+      return auth.register(email, password)
     },
     login (email, password) {
-      return api.authenticate({
-        strategy: 'local',
-        email: email,
-        password: password
-      })
+      return auth.login (email, password)
     }
   },
   mounted () {
