@@ -333,7 +333,7 @@ module.exports = function() {
 
 ### Frontend
 
-We create a new **src/auth.js** file in the frontend to manage authentication and keep track of the logged in user. This module acts as a simple wrapper around the Feathers authentication API, which makes the Vue components a bit simpler.
+We create a new **src/auth.js** file in the frontend to manage authentication and keep track of the logged in user. This module acts as a simple wrapper around the Feathers authentication API, which makes the Vue components a bit simpler. We also used it in the Vue router guard, to determine if there is an authenticated user (see before).
 ```javascript
 // Import the Feathers client module that we've created before
 import api from 'src/api'
