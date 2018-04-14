@@ -247,7 +247,7 @@ From a end-user perspective the application will be simple:
   </q-layout>
   ```
  
- We update the router configuration in **src/router/routes.js** to reflect this as well:
+We update the router configuration in **src/router/routes.js** to reflect this as well:
 ```javascript
 export default [
   {
@@ -257,7 +257,7 @@ export default [
       { path: '/home', name: 'home', component: () => import('pages/Home') },
       { path: '/signin', name: 'signin', component: () => import('pages/SignIn') },
       { path: '/register', name: 'register', component: () => import('pages/SignIn') },
-      { path: '/chat', name: 'chat', component: () => import('pages/Chat') }
+      { path: '/chat', name: 'chat', component: () => import('pages/Chat'), meta: { requiresAuth: true } }
     ]
   },
 
@@ -267,7 +267,36 @@ export default [
   }
 ]
 ```
- 
+
+We set a ```requiresAuth: true``` flag in the ```meta``` property of the 'chat' route. This is used to implement a Vue "router guard" which enforces authentication on the Chat page (the Chat page should only be accessible after the user logs in).
+
+The router guard goes into the **src/router/index.js** file and consists of a ```router.beforeEach``` method which accepts three parameters (```to```, ```from``` and ```next```), as shown below.
+
+```javascript
+...
+// Import the client 'auth' module which allows us to check if there's an authenticated user
+import auth from 'src/auth'
+...
+router.beforeEach((to, from, next) => {
+
+  if (!to.meta.requiresAuth || auth.authenticated()) {
+    // All is okay, let the route change continue
+    next()
+  } else {
+    console.log('Not authenticated')
+    // Cancel the route change and redirect back to the Home page
+    next({ path: '/home' })
+  }
+})
+...
+```
+
+The ```to``` parameter is the route which we are trying to navigate to, ```from``` is the route we're coming from, and ```next``` is a callback function which we'll call to determine the outcome of the route change attempt. Consult [this](https://router.vuejs.org/en/advanced/navigation-guards.html) page for details.
+
+If we see that the route that we try to navigate to requires authentication (this is the ```meta.requiresAuth``` property which we've set in **src/router/index.js**), then we check if there is an authenticated user. If there isn't, then we cancel the navigation attempt, and redirect back to the Home page (from where the user can log in) by calling ```next({ path: '/home' })```.
+
+The 'auth' module which we use to check if there's an authenticated user will be created later.
+
 ## Authentication
 
 ### Backend
@@ -304,6 +333,104 @@ module.exports = function() {
 
 ### Frontend
 
+We create a new **src/auth.js** file in the frontend to manage authentication and keep track of the logged in user. This module acts as a simple wrapper around the Feathers authentication API, which makes the Vue components a bit simpler.
+```javascript
+// Import the Feathers client module that we've created before
+import api from 'src/api'
+
+const auth = {
+
+  // keep track of the logged in user
+  user: null,
+
+  getUser() {
+    return this.user
+  },
+
+  fetchUser (accessToken) {
+
+    return api.passport.verifyJWT(accessToken)
+      .then(payload => {
+        return api.service('users').get(payload.userId)
+      })
+      .then(user => {
+        return Promise.resolve(user)
+      })
+  },
+
+  authenticate () {
+
+    return api.authenticate()
+      .then((response) => {
+        return this.fetchUser(response.accessToken)
+      })
+      .then(user => {
+        this.user = user
+        return Promise.resolve(user)
+      })
+      .catch((err) => {
+        this.user = null
+        return Promise.reject(err)
+      })
+  },
+
+  authenticated () {
+    return this.user != null
+  },
+
+  signout () {
+
+    return api.logout()
+      .then(() => {
+        this.user = null
+      })
+      .catch((err) => {
+        return Promise.reject(err)
+      })
+  },
+
+  onLogout (callback) {
+
+    api.on('logout', () => {
+      this.user = null
+      callback()
+    })
+  },
+
+  onAuthenticated (callback) {
+
+    api.on('authenticated', response => {
+      this.fetchUser(response.accessToken)
+      .then(user => {
+        this.user = user
+        callback(this.user)
+      })
+      .catch((err) => {
+        callback(this.user)
+      })
+    })
+  },
+
+  register (email, password) {
+    return api.service('users').create({
+      email: email,
+      password: password
+    })
+  },
+
+  login (email, password) {
+    return api.authenticate({
+      strategy: 'local',
+      email: email,
+      password: password
+    })
+  }
+
+}
+
+export default auth
+```
+
 On the frontend we setup the **src/components/SignIn.vue** component as a [basic dialog](http://quasar-framework.org/components/dialog.html) with e-mail/password inputs:
 ```javascript
 <template>
@@ -326,7 +453,7 @@ On the frontend we setup the **src/components/SignIn.vue** component as a [basic
 </template>
 
 <script>
-import api from 'src/api'
+import auth from 'src/auth'
 
 export default {
   data () {
@@ -378,17 +505,10 @@ export default {
       return this.$route.name === 'register'
     },
     register (email, password) {
-      return api.service('users').create({
-        email: email,
-        password: password
-      })
+      return auth.register(email, password)
     },
     login (email, password) {
-      return api.authenticate({
-        strategy: 'local',
-        email: email,
-        password: password
-      })
+      return auth.login (email, password)
     }
   },
   mounted () {
@@ -403,11 +523,13 @@ export default {
 </style>
 ```
 
-We manage registration as well as login depending on the route used to reach the component.
+We manage registration as well as login, depending on the route used to reach the component.
 
-Once connected the user should land on the home page then be able to navigate in the app, so that in the main layout we have to track the login state as the currently connected user in **$data.user** (null if not logged in). We will also manage logout from the profile menu entry and restoring the previous session if any by trying to authenticate on mounting **src/layouts/default.vue**:
+The component's ```login``` and ```register``` method simply delegate to the login/register methods of the ```auth``` module that we've created before.
+
+Once connected, the user should land on the home page then be able to navigate in the app, so that in the main layout we have to track the login state as the currently connected user in **$data.user** (null if not logged in). We will also manage logout from the profile menu entry and restoring the previous session if any by trying to authenticate on mounting **src/layouts/default.vue**:
 ```javascript
-import api from 'src/api'
+import auth from 'src/auth'
 
 export default {
   name: 'index',
@@ -429,7 +551,7 @@ export default {
       this.$router.push({ name: route })
     },
     signout () {
-      api.logout()
+      auth.signout()
         .then(() => {
           this.$q.notify({type: 'positive', message: 'You are now logged out, sign in again to continue to work'})
         })
@@ -437,41 +559,33 @@ export default {
             this.$q.notify({type: 'positive', message: 'Cannot logout, please check again in a few minutes'})
         })
     },
-    getUser (accessToken) {
-      return api.passport.verifyJWT(accessToken)
-          .then(payload => {
-          return api.service('users').get(payload.userId)
-        })
-    .then(user => {
-        this.$data.user = user
-      return user
-    })
+    setUser (user) {
+      this.$data.user = user
     }
   },
   mounted () {
     // Check if there is already a session running
-    api.authenticate()
-      .then((response) => {
-      return this.getUser(response.accessToken)
-    })
-  .then(user => {
+    auth.authenticate()
+    .then((user) => {
+      this.setUser(user)
       this.$q.notify({type: 'positive', message: 'Restoring previous session'})
-  })
-  .catch(() => {
+    })
+    .catch(_ => {
+      this.setUser(null)
       this.$router.push({ name: 'home' })
-  })
-    // On successfull login
-    api.on('authenticated', response => {
-      this.getUser(response.accessToken)
-      .then(user => {
+    })
+
+    // On successful login
+    auth.onAuthenticated((user) => {
+      this.setUser(user)
       this.$router.push({ name: 'home' })
-  })
-  })
+    })
+
     // On logout
-    api.on('logout', () => {
-      this.$data.user = null
-    this.$router.push({ name: 'home' })
-  })
+    auth.onLogout(() => {
+      this.setUser(null)
+      this.$router.push({ name: 'home' })
+    })
   },
   beforeDestroy () {
   }
@@ -633,7 +747,7 @@ module.exports = {
 Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages. We will also use the built-in [list](http://quasar-framework.org/components/lists-and-list-items.html) to list available people. Last, we will use a simple [text input](http://quasar-framework.org/components/input.html#Labeling) to send messages in the chat room. Inside the component these data are respectively stored in **$data.messages**, **$data.users**, **$data.message**. The final template of the **src/components/Chat.vue** component is thus the following:
 ```html
   <q-page class="flex flex-center">
-      <div class="row">
+      <div class="row full-width">
         <div class="layout-padding col-8" >
           <q-chat-message v-for="message in messages" :key="message.id"
             :text="[message.text]"
