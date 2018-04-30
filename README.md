@@ -21,6 +21,7 @@ Although this tutorial details the path to create an application skeleton featur
 
 You can also download the source code of the app by cloning this repo and jump in the **quasar-feathers** directory:
 ```
+npm/yarn install -g quasar-cli
 git clone https://github.com/claustres/quasar-feathers-tutorial
 cd quasar-feathers-tutorial
 cd quasar-feathers
