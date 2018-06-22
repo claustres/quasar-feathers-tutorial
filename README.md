@@ -58,7 +58,7 @@ $ quasar dev
 
 Feathers for the backend in the app root directory:
 ```bash
-$ npm install -g feathers-cli
+$ npm install -g @feathersjs/cli
 $ mkdir api
 $ cd api
 // For latest Feathers (Auk release)
