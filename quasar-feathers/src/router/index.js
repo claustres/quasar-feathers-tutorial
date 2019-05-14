@@ -6,31 +6,33 @@ import auth from 'src/auth'
 
 Vue.use(VueRouter)
 
-const router = new VueRouter({
-  /*
-   * NOTE! Change Vue Router mode from quasar.conf.js -> build -> vueRouterMode
-   *
-   * If you decide to go with "history" mode, please also set "build.publicPath"
-   * to something other than an empty string.
-   * Example: '/' instead of ''
-   */
+/*
+ * If not building with SSR mode, you can
+ * directly export the Router instantiation
+ */
 
-  // Leave as is and change from quasar.conf.js instead!
-  mode: process.env.VUE_ROUTER_MODE,
-  base: process.env.VUE_ROUTER_BASE,
-  scrollBehavior: () => ({ y: 0 }),
-  routes
-})
+export default function (/* { store, ssrContext } */) {
+  const Router = new VueRouter({
+    scrollBehavior: () => ({ y: 0 }),
+    routes,
 
-router.beforeEach((to, from, next) => {
+    // Leave these as is and change from quasar.conf.js instead!
+    // quasar.conf.js -> build -> vueRouterMode
+    // quasar.conf.js -> build -> publicPath
+    mode: process.env.VUE_ROUTER_MODE,
+    base: process.env.VUE_ROUTER_BASE
+  })
 
-  if (!to.meta.requiresAuth || auth.authenticated()) {
-    next()
-  } else {
-    console.log('Not authenticated')
+  Router.beforeEach((to, from, next) => {
+    if (!to.meta.requiresAuth || auth.authenticated()) {
+      // All is okay, let the route change continue
+      next()
+    } else {
+      console.log('Not authenticated')
+      // Cancel the route change and redirect back to the Home page
+      next({ path: '/home' })
+    }
+  })
 
-    next({ path: '/home' })
-  }
-})
-
-export default router
+  return Router
+}
