@@ -49,7 +49,7 @@ Each framework provides its own CLI so that starting a project is easy, with a c
 Quasar for the frontend:
 ```bash
 $ npm install -g quasar-cli
-$ quasar init quasar-feathers
+$ quasar create quasar-feathers
 $ cd quasar-feathers
 $ npm install
 // Will launch the frontend server in dev mode on 8080
@@ -89,19 +89,6 @@ force src/services/index.js
 create src/models/messages.model.js
 create src/services/messages/messages.hooks.js
 create test/services/messages.test.js
-```
-
-To make the Quasar app correctly contacting the backend you have to configure an API proxy in your frontend **config/index.js**:
-```javascript
-...
-  dev: {
-    proxyTable: {
-      '/api': {
-        target: 'http://localhost:3030',
-        changeOrigin: true
-      }
-    }
-    ...
 ```
 
 ## API glue
@@ -150,7 +137,7 @@ users.on('created', user => {
 ## Main layout
 
 From a end-user perspective the application will be simple:
- - a menu toolbar including (**src/layouts/default.vue** component)
+ - a menu toolbar including (**src/layouts/MyLayout.vue** component)
    - a sign in/register entry when not connected
    - home/chat entries and a signout menu to logout when connected
  - a sidebar menu recalling the home/chat entries and a about section
@@ -165,7 +152,7 @@ From a end-user perspective the application will be simple:
  $ quasar new page Chat
  ```
  
- We update the layout of the **src/layouts/default.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a logout [button](http://quasar-framework.org/components/button.html), a [Sidebar menu](http://quasar-framework.org/components/layout.html#Navigation-from-drawer-panels) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
+ We update the layout of the **src/layouts/MyLayout.vue** template to include a [Toolbar with some entries](http://quasar-framework.org/components/toolbar.html), a logout [button](http://quasar-framework.org/components/button.html), a [Sidebar menu](http://quasar-framework.org/components/layout.html#Navigation-from-drawer-panels) and an [entry point for other components](https://router.vuejs.org/en/api/router-view.html):
  ```html
   <q-layout>
     <q-layout-header>
@@ -432,7 +419,7 @@ const auth = {
 export default auth
 ```
 
-On the frontend we setup the **src/components/SignIn.vue** component as a [basic dialog](http://quasar-framework.org/components/dialog.html) with e-mail/password inputs:
+On the frontend we setup the **src/pages/SignIn.vue** component as a [basic dialog](http://quasar-framework.org/components/dialog.html) with e-mail/password inputs:
 ```javascript
 <template>
   <q-page class="flex flex-center">
@@ -528,7 +515,7 @@ We manage registration as well as login, depending on the route used to reach th
 
 The component's ```login``` and ```register``` method simply delegate to the login/register methods of the ```auth``` module that we've created before.
 
-Once connected, the user should land on the home page then be able to navigate in the app, so that in the main layout we have to track the login state as the currently connected user in **$data.user** (null if not logged in). We will also manage logout from the profile menu entry and restoring the previous session if any by trying to authenticate on mounting **src/layouts/default.vue**:
+Once connected, the user should land on the home page then be able to navigate in the app, so that in the main layout we have to track the login state as the currently connected user in **$data.user** (null if not logged in). We will also manage logout from the profile menu entry and restoring the previous session if any by trying to authenticate on mounting **src/layouts/MyLayout.vue**:
 ```javascript
 import auth from 'src/auth'
 
@@ -745,7 +732,7 @@ module.exports = {
 
 ### Frontend
 
-Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages. We will also use the built-in [list](http://quasar-framework.org/components/lists-and-list-items.html) to list available people. Last, we will use a simple [text input](http://quasar-framework.org/components/input.html#Labeling) to send messages in the chat room. Inside the component these data are respectively stored in **$data.messages**, **$data.users**, **$data.message**. The final template of the **src/components/Chat.vue** component is thus the following:
+Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.org/components/chat.html) that we will use to display our messages. We will also use the built-in [list](http://quasar-framework.org/components/lists-and-list-items.html) to list available people. Last, we will use a simple [text input](http://quasar-framework.org/components/input.html#Labeling) to send messages in the chat room. Inside the component these data are respectively stored in **$data.messages**, **$data.users**, **$data.message**. The final template of the **src/pages/Chat.vue** component is thus the following:
 ```html
   <q-page class="flex flex-center">
       <div class="row full-width">
@@ -784,7 +771,7 @@ Helpfully Quasar comes with a built-in [chat component](http://quasar-framework.
 
 As you can see we rely on the Quasar [positioning classes](http://quasar-framework.org/components/positioning.html) to make the message input be fixed at the bottom of the page.
 
-Retrieving messages/users on mount and in real-time is a piece of cake in **src/components/Chat.vue**:
+Retrieving messages/users on mount and in real-time is a piece of cake in **src/pages/Chat.vue**:
 ```javascript
 ...
   mounted () {

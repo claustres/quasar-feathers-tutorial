@@ -1,11 +1,9 @@
-'use strict';
-
 // Application hooks that run for every service
-const logger = require('./hooks/logger')
+const logger = require('./hooks/logger');
 
 module.exports = {
   before: {
-    all: [],
+    all: [ logger() ],
     find: [],
     get: [],
     create: [],
@@ -33,4 +31,4 @@ module.exports = {
     patch: [],
     remove: []
   }
-}
+};

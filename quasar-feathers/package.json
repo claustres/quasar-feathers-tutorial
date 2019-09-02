@@ -1,47 +1,44 @@
 {
   "name": "quasar-feathers",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A Quasar Framework app",
   "productName": "Quasar App",
   "cordovaId": "org.cordova.quasar.app",
   "author": "Your Name <your@email.com>",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .js,.vue src",
+    "lint": "eslint --fix --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@feathersjs/authentication-client": "^1.0.2",
-    "@feathersjs/feathers": "^3.1.0",
-    "@feathersjs/socketio-client": "^1.0.2",
-    "engine.io-client": "^3.1.4",
-    "moment": "^2.18.1",
-    "isarray": "^2.0.2",
-    "socket.io-client": "^1.7.3",
-    "socket.io-parser": "^3.1.2",
-    "vue": "^2.5.11",
-    "vue-router": "^3.0.1"
+    "@feathersjs/authentication-client": "^1.0.11",
+    "@feathersjs/feathers": "^3.3.1",
+    "@feathersjs/socketio-client": "^1.2.1",
+    "@quasar/extras": "^1.2.0",
+    "moment": "^2.24.0",
+    "quasar": "^1.0.5",
+    "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
-    "babel-eslint": "^8.2.1",
-    "eslint": "^4.18.2",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-friendly-formatter": "^3.0.0",
-    "eslint-loader": "^2.0.0",
-    "eslint-plugin-import": "^2.9.0",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-promise": "^3.7.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "eslint-plugin-vue": "^4.3.0",
-    "quasar-cli": "^0.15.14"
+    "@quasar/app": "^1.0.4",
+    "@vue/eslint-config-standard": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.10.0",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-vue": "^5.2.3",
+    "strip-ansi": "=3.0.1"
   },
   "engines": {
     "node": ">= 8.9.0",
-    "npm": ">= 5.6.0"
+    "npm": ">= 5.6.0",
+    "yarn": ">= 1.6.0"
   },
   "browserslist": [
     "> 1%",
     "last 2 versions",
     "not ie <= 10"
-  ]
+  ],
+  "resolutions": {
+    "ajv": "6.8.1"
+  }
 }

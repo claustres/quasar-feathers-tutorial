@@ -1,16 +1,16 @@
+// Import the Feathers client module that we've created before
 import api from 'src/api'
-//import { Promise } from 'es6-promise'
 
 const auth = {
 
+  // keep track of the logged in user
   user: null,
 
-  getUser() {
+  getUser () {
     return this.user
   },
 
   fetchUser (accessToken) {
-
     return api.passport.verifyJWT(accessToken)
       .then(payload => {
         return api.service('users').get(payload.userId)
@@ -21,26 +21,16 @@ const auth = {
   },
 
   authenticate () {
-    console.log('auth')
-
     return api.authenticate()
       .then((response) => {
-        console.log('auth successful')
-
         return this.fetchUser(response.accessToken)
       })
       .then(user => {
-        console.log('got user')
-
         this.user = user
-
         return Promise.resolve(user)
       })
       .catch((err) => {
-        console.log('auth failed', err)
-
         this.user = null
-
         return Promise.reject(err)
       })
   },
@@ -50,50 +40,33 @@ const auth = {
   },
 
   signout () {
-    console.log('signout')
-
     return api.logout()
       .then(() => {
-        console.log('signout successful')
-
         this.user = null
       })
       .catch((err) => {
-        console.log('signout failed', err)
-
         return Promise.reject(err)
       })
   },
 
   onLogout (callback) {
-
     api.on('logout', () => {
-      console.log('onLogout')
-
       this.user = null
-
       callback()
     })
   },
 
   onAuthenticated (callback) {
-
     api.on('authenticated', response => {
-      console.log('onAuthenticate', response)
-
       this.fetchUser(response.accessToken)
-      .then(user => {
-        console.log('onAuthenticate got user')
-
-        this.user = user
-
-        callback(this.user)
-      })
-      .catch((err) => {
-        console.log('onAuthenticate get user failed', err)
-
-        callback(this.user)
-      })
+        .then(user => {
+          this.user = user
+          callback(this.user)
+        })
+        .catch((err) => {
+          console.log('onAuthenticate get user failed', err)
+          callback(this.user)
+        })
     })
   },
 

@@ -35,11 +35,17 @@
 </template>
 
 <script>
-import moment from 'moment'
 import api from 'src/api'
+import moment from 'moment'
+import { QInput, QItemTile, QChatMessage } from 'quasar'
 
 export default {
-  name: 'chat',
+  name: 'q-chat',
+  components: {
+    QInput,
+    QItemTile,
+    QChatMessage
+  },
   props: ['user'],
   data () {
     return {
@@ -65,6 +71,7 @@ export default {
       }
     }
   },
+  // name: 'PageName',
   mounted () {
     const messages = api.service('messages')
     const users = api.service('users')
@@ -95,15 +102,9 @@ export default {
       console.log('user received')
       this.$data.users = this.$data.users.concat(user)
     })
-  },
-  beforeDestroy () {
   }
 }
 </script>
 
-<style lang="styl">
-  .chat-message .q-input-area {
-    min-height: 19px !important;
-    height: 19px !important;
-  }
+<style>
 </style>
