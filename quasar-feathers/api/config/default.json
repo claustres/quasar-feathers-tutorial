@@ -1,8 +1,7 @@
 {
   "host": "localhost",
-  "port": 8081,
-  "apiPath": "/api",
-  "public": "../public/",
+  "port": 3030,
+  "public": "../dist/spa",
   "paginate": {
     "default": 10,
     "max": 50

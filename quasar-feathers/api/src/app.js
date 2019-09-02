@@ -1,5 +1,4 @@
 const path = require('path');
-const favicon = require('serve-favicon');
 const compress = require('compression');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -9,7 +8,6 @@ const feathers = require('@feathersjs/feathers');
 const configuration = require('@feathersjs/configuration');
 const express = require('@feathersjs/express');
 const socketio = require('@feathersjs/socketio');
-
 
 const middleware = require('./middleware');
 const services = require('./services');
@@ -28,9 +26,13 @@ app.use(cors());
 app.use(compress());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
 // Host the public folder
-app.use('/', express.static(app.get('public')));
+if (process.env.NODE_ENV === 'production') {
+  app.use('/', express.static(app.get('public')));
+}
+else {
+  app.use('/statics/', express.static('../../src/statics'));
+}
 
 // Set up Plugins and providers
 app.configure(express.rest());

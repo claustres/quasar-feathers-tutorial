@@ -9,11 +9,9 @@ module.exports = function (ctx) {
       'app.styl'
     ],
     extras: [
-      ctx.theme.mat ? 'roboto-font' : null,
-      'material-icons' // optional, you are not bound to it
-      // 'ionicons',
-      // 'mdi',
-      // 'fontawesome'
+      'roboto-font',
+      'material-icons',
+      'fontawesome-v5'
     ],
     supportIE: false,
     build: {
