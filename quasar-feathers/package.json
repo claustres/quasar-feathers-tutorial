@@ -17,7 +17,7 @@
     "engine.io-client": "^3.1.4",
     "moment": "^2.18.1",
     "isarray": "^2.0.2",
-    "socket.io-client": "^1.7.3",
+    "socket.io-client": "^4.5.4",
     "socket.io-parser": "^3.1.2",
     "vue": "^2.5.11",
     "vue-router": "^3.0.1"
